@@ -50,17 +50,12 @@
   </label>
 </header>
 
-<!-- イメージ画像 (ogp.png) の埋め込み -->
-<div class="w-full max-w-3xl mx-auto mb-8">
-  <img src="ogp.png" alt="写真をドット絵に変換" class="w-full h-auto rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-</div>
-
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
 <div class="lg:col-span-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-5 h-fit">
   <h2 class="text-lg font-bold">設定</h2>
   <div>
-    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">写真を選ぶ</label>
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">写真を選ぶ（上書きされます）</label>
     <input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 dark:file:bg-indigo-900/50 file:text-indigo-700 dark:file:text-indigo-300 file:font-bold file:cursor-pointer text-slate-500">
   </div>
   <div>
@@ -112,8 +107,6 @@
   </div>
   
   <div id="preview-container" class="w-full aspect-square md:aspect-video bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-grab">
-    <p id="empty" class="text-sm text-slate-400 pointer-events-none">写真を選ぶと表示されます</p>
-    
     <div id="img-wrapper" class="relative hidden">
       <canvas id="cv" class="block w-full h-full" style="image-rendering: pixelated;"></canvas>
       <canvas id="cv-grid" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
@@ -204,7 +197,6 @@ const render = () => {
   const ctxOrg = cvOrg.getContext('2d');
   ctxOrg.drawImage(img, sx, sy, sw, sh, 0, 0, cvOrg.width, cvOrg.height);
 
-  $('empty').classList.add('hidden');
   const wrapper = $('img-wrapper');
   wrapper.classList.remove('hidden');
   
@@ -344,6 +336,34 @@ const loadImage = (f) => {
   im.src = URL.createObjectURL(f);
 };
 
+// サンプル画像を自動生成する関数
+const loadSampleImage = () => {
+  const c = document.createElement('canvas');
+  c.width = 400; c.height = 300;
+  const ctx = c.getContext('2d');
+  
+  // 空
+  ctx.fillStyle = '#87CEEB'; ctx.fillRect(0, 0, 400, 300);
+  // 太陽
+  ctx.fillStyle = '#FFD700'; ctx.beginPath(); ctx.arc(320, 80, 40, 0, Math.PI*2); ctx.fill();
+  // 地面
+  ctx.fillStyle = '#32CD32'; ctx.fillRect(0, 200, 400, 100);
+  // 家の壁
+  ctx.fillStyle = '#FFF8DC'; ctx.fillRect(80, 120, 100, 80);
+  // 屋根
+  ctx.fillStyle = '#CD5C5C'; ctx.beginPath(); ctx.moveTo(70, 120); ctx.lineTo(130, 60); ctx.lineTo(190, 120); ctx.fill();
+  // 窓
+  ctx.fillStyle = '#87CEFA'; ctx.fillRect(100, 140, 20, 20); ctx.fillRect(140, 140, 20, 20);
+  // 木の幹
+  ctx.fillStyle = '#8B4513'; ctx.fillRect(250, 150, 20, 50);
+  // 木の葉
+  ctx.fillStyle = '#228B22'; ctx.beginPath(); ctx.arc(260, 130, 40, 0, Math.PI*2); ctx.fill();
+
+  const im = new Image();
+  im.onload = () => { img = im; render(); };
+  im.src = c.toDataURL();
+};
+
 window.addEventListener('DOMContentLoaded', () => {
   $('darkToggle').addEventListener('change', e => {
     if (e.target.checked) document.documentElement.classList.add('dark');
@@ -393,6 +413,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const text = `# ドット絵データ（幅${cur.w} × 高さ${cur.h}）\n# 下の表は、色の番号を並べたものです（番号は0から始まります）。\n${rows(',')}\n# 番号とカラーコード\n${cur.pal.map((c, i) => i + ': ' + c).join('\n')}\n# この表とカラー一覧をもとに、Excelのセルを塗りつぶすマクロを作ってください。`;
     copy(e.target, text);
   });
+  
+  // 起動時にサンプル画像を読み込む
+  loadSampleImage();
 });
 </script>
 
