@@ -14,81 +14,130 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://zero-kobo.github.io/dot-art/ogp.png">
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+  }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  body{font-family:'Noto Sans JP',sans-serif;background:#f8fafc}
-  #cv{image-rendering:pixelated;width:100%;height:auto;background:#fff}
+  body{font-family:'Noto Sans JP',sans-serif;}
   input[type=range]{accent-color:#6366f1}
-  /* ドラッグ＆ドロップ時の視覚効果 */
-  body.dragover { background: #e0e7ff; outline: 4px dashed #6366f1; outline-offset: -10px; }
+  body.dragover { outline: 4px dashed #6366f1; outline-offset: -10px; }
+  #preview-container { touch-action: none; overflow: hidden; position: relative; }
+  #img-wrapper { transform-origin: top left; transition: transform 0.05s ease-out; }
+  input[type="color"] { -webkit-appearance: none; border: none; padding: 0; border-radius: 0.5rem; overflow: hidden; }
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  input[type="color"]::-webkit-color-swatch { border: none; }
 </style>
 </head>
-<body class="text-slate-800 antialiased p-4 md:p-8 transition-colors duration-200">
-<div class="max-w-5xl mx-auto space-y-6">
+<body class="text-slate-800 bg-slate-50 dark:bg-slate-900 dark:text-slate-200 antialiased p-4 md:p-8 transition-colors duration-300">
+<div class="max-w-6xl mx-auto space-y-6">
 
-<header class="text-center mb-6">
-<h1 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">写真をドット絵に変換</h1>
-<p class="text-slate-500 mt-2">写真は端末の中だけで処理され、外部には送信されません。<br class="md:hidden">画面へのドラッグ＆ドロップも可能です。</p>
+<header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+  <div class="text-center md:text-left">
+    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">写真をドット絵に変換</h1>
+    <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">端末内処理で安心。画面へのドラッグ＆ドロップも可能です。</p>
+  </div>
+  <label class="flex items-center cursor-pointer gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
+    <span class="text-sm font-bold">🌙 ダークモード</span>
+    <div class="relative">
+      <input type="checkbox" id="darkToggle" class="sr-only">
+      <div class="block bg-slate-200 dark:bg-indigo-600 w-10 h-6 rounded-full transition"></div>
+      <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition transform dark:translate-x-4"></div>
+    </div>
+  </label>
 </header>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-<div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-5">
-<h2 class="text-lg font-bold">設定</h2>
-<div>
-<label class="block text-sm font-medium text-slate-600 mb-1" for="file">写真を選ぶ</label>
-<input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-bold file:cursor-pointer">
-</div>
-<div>
-<label class="block text-sm font-medium text-slate-600 mb-1" for="w">横のドット数: <b id="wv">48</b></label>
-<input type="range" id="w" min="16" max="96" step="1" value="48" class="w-full cursor-pointer">
-</div>
-<div>
-<label class="block text-sm font-medium text-slate-600 mb-1" for="pal">配色</label>
-<select id="pal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 cursor-pointer">
-<option value="auto" selected>写真の色に近づける</option>
-<option value="nes">ファミコン風（16色）</option>
-<option value="gb">ゲームボーイ風（4色）</option>
-<option value="bw">白黒（2色）</option>
-</select>
-</div>
-<div id="lvBox" class="transition-opacity">
-<label class="block text-sm font-medium text-slate-600 mb-1" for="lv">色の細かさ</label>
-<select id="lv" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 cursor-pointer">
-<option value="2">少ない（最大8色）</option>
-<option value="3">やや少ない（最大27色）</option>
-<option value="4" selected>ふつう（最大64色）</option>
-<option value="6">多い（最大216色）</option>
-</select>
-</div>
-<label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="sq" class="w-4 h-4 text-indigo-600 rounded"> 正方形に切り抜く（アイコン用）</label>
+<!-- イメージ画像 (ogp.png) の埋め込み -->
+<div class="w-full max-w-3xl mx-auto mb-8">
+  <img src="ogp.png" alt="写真をドット絵に変換" class="w-full h-auto rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
 </div>
 
-<div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-4 self-start">
-<h2 class="text-lg font-bold">変換結果</h2>
-<p id="empty" class="text-sm text-slate-400">写真を選ぶと、ここにドット絵が表示されます。</p>
-<canvas id="cv" class="hidden rounded-xl border border-slate-200 shadow-inner"></canvas>
-<p id="info" class="text-xs text-slate-500"></p>
-<div class="grid grid-cols-2 gap-2">
-<!-- disabled時のスタイルを追加、初期状態はdisabled -->
-<button id="bPng" class="bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity" disabled>PNGで保存</button>
-<button id="bXlsx" class="bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity" disabled>Excelで保存</button>
-<button id="bTsv" class="bg-slate-100 text-slate-700 font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity" disabled>番号の表をコピー</button>
-<button id="bAi" class="bg-slate-100 text-slate-700 font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity" disabled>AI用テキストをコピー</button>
-</div>
-</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+<div class="lg:col-span-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-5 h-fit">
+  <h2 class="text-lg font-bold">設定</h2>
+  <div>
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">写真を選ぶ</label>
+    <input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 dark:file:bg-indigo-900/50 file:text-indigo-700 dark:file:text-indigo-300 file:font-bold file:cursor-pointer text-slate-500">
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="w">横のドット数: <b id="wv" class="text-indigo-600 dark:text-indigo-400">48</b></label>
+    <input type="range" id="w" min="16" max="128" step="1" value="48" class="w-full cursor-pointer">
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="pal">配色</label>
+    <select id="pal" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-3 cursor-pointer">
+      <option value="auto" selected>写真の色に近づける</option>
+      <option value="nes">ファミコン風（16色）</option>
+      <option value="gb">ゲームボーイ風（4色）</option>
+      <option value="bw">白黒（2色）</option>
+      <option value="custom">カスタム（4色指定）</option>
+    </select>
+  </div>
+  
+  <div id="customPalBox" class="hidden grid grid-cols-4 gap-2">
+    <input type="color" value="#ff0000" class="custom-c w-full h-10 cursor-pointer shadow-sm">
+    <input type="color" value="#00ff00" class="custom-c w-full h-10 cursor-pointer shadow-sm">
+    <input type="color" value="#0000ff" class="custom-c w-full h-10 cursor-pointer shadow-sm">
+    <input type="color" value="#ffff00" class="custom-c w-full h-10 cursor-pointer shadow-sm">
+  </div>
+
+  <div id="lvBox" class="transition-opacity">
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="lv">色の細かさ</label>
+    <select id="lv" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-3 cursor-pointer">
+      <option value="2">少ない（最大8色）</option>
+      <option value="3">やや少ない（最大27色）</option>
+      <option value="4" selected>ふつう（最大64色）</option>
+      <option value="6">多い（最大216色）</option>
+    </select>
+  </div>
+  
+  <div class="space-y-3 pt-2">
+    <label class="flex items-center gap-2 text-sm cursor-pointer">
+      <input type="checkbox" id="sq" class="w-5 h-5 text-indigo-600 rounded"> 正方形に切り抜く
+    </label>
+    <label class="flex items-center gap-2 text-sm cursor-pointer">
+      <input type="checkbox" id="gridToggle" class="w-5 h-5 text-indigo-600 rounded"> ドットのグリッド線を表示
+    </label>
+  </div>
 </div>
 
-<section class="bg-white p-6 rounded-3xl border border-slate-100 text-sm leading-relaxed text-slate-600 space-y-4 max-w-3xl mt-6">
-<h2 class="text-lg font-bold text-slate-800">使い方</h2>
-<p>写真を選んで、横のドット数と配色を決めるだけです。ドット数が少ないほど、粗いドット絵になります。</p>
-<h3 class="font-bold text-slate-800">写真はアップロードされますか？</h3>
-<p>いいえ。変換はすべてお使いの端末の中で行い、写真は外部に送信されません。</p>
-<h3 class="font-bold text-slate-800">Excelやマクロで使うには？</h3>
-<p>「Excelで保存」を押すと、1ドットを1セルとして色をつけたファイルが保存されます。「番号の表をコピー」は、色の番号を並べた表で、Excelにそのまま貼れます。「AI用テキストをコピー」は、番号の表と色の一覧が入っているので、AIにマクロを作らせる素材になります。</p>
-</section>
+<div class="lg:col-span-8 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 flex flex-col">
+  <div class="flex justify-between items-center">
+    <h2 class="text-lg font-bold">プレビュー <span class="text-xs font-normal text-slate-500 ml-2">スクロールで拡大・ドラッグで移動</span></h2>
+    <button id="btnResetZoom" class="text-xs bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition hidden">ズームリセット</button>
+  </div>
+  
+  <div id="preview-container" class="w-full aspect-square md:aspect-video bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-grab">
+    <p id="empty" class="text-sm text-slate-400 pointer-events-none">写真を選ぶと表示されます</p>
+    
+    <div id="img-wrapper" class="relative hidden">
+      <canvas id="cv" class="block w-full h-full" style="image-rendering: pixelated;"></canvas>
+      <canvas id="cv-grid" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+      <canvas id="cv-original" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="clip-path: inset(0 50% 0 0);"></canvas>
+      
+      <div id="compare-handle" class="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_5px_rgba(0,0,0,0.5)] cursor-ew-resize hidden" style="left: 50%; transform: translateX(-50%);">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-800 dark:text-white font-bold text-xs select-none">
+          &lt;&gt;
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <p id="info" class="text-xs text-slate-500 dark:text-slate-400 text-center"></p>
+  
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-auto">
+    <button id="bPng" class="bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>PNG保存</button>
+    <button id="bXlsx" class="bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>Excel保存</button>
+    <button id="bTsv" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>番号表コピー</button>
+    <button id="bAi" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>AI用コピー</button>
+  </div>
+</div>
 
+</div>
 </div>
 
 <script>
@@ -100,29 +149,41 @@ const PAL = {
 };
 let img = null, cur = null;
 const hex = (r,g,b) => '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
-// 修正：substr を slice に変更
 const rgb = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16));
 const nearest = (r,g,b,pal) => { let best = 0, bd = 1e9; pal.forEach((p,i) => { const d = (r-p[0])**2 + (g-p[1])**2 + (b-p[2])**2; if (d < bd) { bd = d; best = i; } }); return best; };
+
+let compPos = 50;
 
 const render = () => {
   if (!img) return;
   const w = +$('w').value; $('wv').textContent = w;
   
-  // 修正：ガタつき防止のため hidden ではなく opacity と pointer-events で制御
-  const isAuto = $('pal').value === 'auto';$('lvBox').style.opacity = isAuto ? '1' : '0.4';
+  const mode = $('pal').value;
+  const isAuto = mode === 'auto';
+  $('lvBox').style.opacity = isAuto ? '1' : '0.4';
   $('lvBox').style.pointerEvents = isAuto ? 'auto' : 'none';
+  
+  $('customPalBox').classList.toggle('hidden', mode !== 'custom');
 
   let sx = 0, sy = 0, sw = img.width, sh = img.height;
   if ($('sq').checked) { const s = Math.min(sw, sh); sx = (sw - s) / 2; sy = (sh - s) / 2; sw = sh = s; }
   const h = Math.max(1, Math.round(w * sh / sw));
+  
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const x = c.getContext('2d', {willReadFrequently: true});
   x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
   x.imageSmoothingQuality = 'high';
   x.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
   const d = x.getImageData(0, 0, w, h).data;
-  const mode = $('pal').value, lv = +$('lv').value;
-  const fixed = PAL[mode] ? PAL[mode].map(rgb) : null;
+  
+  const lv = +$('lv').value;
+  let fixed = null;
+  if (mode === 'custom') {
+    fixed = Array.from(document.querySelectorAll('.custom-c')).map(el => rgb(el.value));
+  } else if (PAL[mode]) {
+    fixed = PAL[mode].map(rgb);
+  }
+
   const map = new Map(), pal = [], idx = [];
   for (let i = 0; i < w * h; i++) {
     const r = d[i*4], g = d[i*4+1], b = d[i*4+2];
@@ -132,33 +193,147 @@ const render = () => {
     if (!map.has(k)) { map.set(k, pal.length); pal.push(k); }
     idx.push(map.get(k));
   }
+
   const cv = $('cv'); cv.width = w; cv.height = h;
   const cx = cv.getContext('2d');
   idx.forEach((n, i) => { cx.fillStyle = pal[n]; cx.fillRect(i % w, Math.floor(i / w), 1, 1); });
-  cv.classList.remove('hidden'); $('empty').classList.add('hidden');$('info').textContent = `${w}×${h}ドット ／ 使用色 ${pal.length}色`;
-  cur = {w, h, idx, pal};
+  
+  const cvOrg = $('cv-original');
+  const orgScale = Math.max(1, Math.floor(1024 / w));
+  cvOrg.width = w * orgScale; cvOrg.height = h * orgScale;
+  const ctxOrg = cvOrg.getContext('2d');
+  ctxOrg.drawImage(img, sx, sy, sw, sh, 0, 0, cvOrg.width, cvOrg.height);
 
-  // ボタンを有効化
+  $('empty').classList.add('hidden');
+  const wrapper = $('img-wrapper');
+  wrapper.classList.remove('hidden');
+  
+  const parent = $('preview-container');
+  const pw = parent.clientWidth - 20, ph = parent.clientHeight - 20;
+  const scaleFit = Math.min(pw / w, ph / h);
+  wrapper.style.width = `${w * scaleFit}px`;
+  wrapper.style.height = `${h * scaleFit}px`;
+
+  $('compare-handle').classList.remove('hidden');$('info').textContent = `${w}×${h}ドット ／ 使用色 ${pal.length}色`;
+  cur = {w, h, idx, pal};
+  
+  drawGrid();
+  resetZoomLayout();
+  updateCompare();
+  
   ['bPng','bXlsx','bTsv','bAi'].forEach(id => $(id).disabled = false);
 };
 
-// 描画の軽量化（スライダーを激しく動かした際のフリーズ防止）
+const drawGrid = () => {
+  const cGrid = $('cv-grid');
+  if (!$('gridToggle').checked || !cur) {
+    cGrid.style.display = 'none';
+    return;
+  }
+  cGrid.style.display = 'block';
+  const scaleRatio = 10;
+  cGrid.width = cur.w * scaleRatio; cGrid.height = cur.h * scaleRatio;
+  const ctx = cGrid.getContext('2d');
+  ctx.clearRect(0, 0, cGrid.width, cGrid.height);
+  ctx.strokeStyle = document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for(let x=1; x<cur.w; x++) { ctx.moveTo(x * scaleRatio, 0); ctx.lineTo(x * scaleRatio, cGrid.height); }
+  for(let y=1; y<cur.h; y++) { ctx.moveTo(0, y * scaleRatio); ctx.lineTo(cGrid.width, y * scaleRatio); }
+  ctx.stroke();
+};
+
 let renderTimer = null;
 const requestRender = () => {
   if (renderTimer) clearTimeout(renderTimer);
   renderTimer = setTimeout(render, 50);
 };
 
+let scale = 1, panX = 0, panY = 0;
+let isPanning = false, isDraggingCompare = false;
+let startX, startY;
+const preview = $('preview-container');
+const wrapper = $('img-wrapper');
+const handle = $('compare-handle');
+const cvOrg = $('cv-original');
+
+const updateTransform = () => {
+  wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  if(scale > 1 || panX !== 0 || panY !== 0) $('btnResetZoom').classList.remove('hidden');
+  else $('btnResetZoom').classList.add('hidden');
+};
+const resetZoomLayout = () => { scale = 1; panX = 0; panY = 0; updateTransform(); };
+$('btnResetZoom').addEventListener('click', resetZoomLayout);
+
+const updateCompare = () => {
+  cvOrg.style.clipPath = `inset(0 ${100 - compPos}% 0 0)`;
+  handle.style.left = `${compPos}%`;
+};
+
+preview.addEventListener('wheel', e => {
+  if(!img) return;
+  e.preventDefault();
+  const delta = -e.deltaY * 0.002;
+  const newScale = Math.min(Math.max(0.5, scale + delta), 10);
+  const rect = wrapper.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  panX -= mouseX * (newScale / scale - 1);
+  panY -= mouseY * (newScale / scale - 1);
+  scale = newScale;
+  updateTransform();
+}, {passive: false});
+
+const onPointerDown = e => {
+  if(!img) return;
+  if(e.target === handle || handle.contains(e.target)) {
+    isDraggingCompare = true;
+  } else {
+    isPanning = true;
+    preview.style.cursor = 'grabbing';
+  }
+  startX = e.clientX || (e.touches && e.touches[0].clientX);
+  startY = e.clientY || (e.touches && e.touches[0].clientY);
+};
+const onPointerMove = e => {
+  if(!img) return;
+  const cx = e.clientX || (e.touches && e.touches[0].clientX);
+  const cy = e.clientY || (e.touches && e.touches[0].clientY);
+  
+  if (isDraggingCompare) {
+    const rect = wrapper.getBoundingClientRect();
+    const xInside = (cx - rect.left) / scale;
+    compPos = Math.max(0, Math.min(100, (xInside / (rect.width / scale)) * 100));
+    updateCompare();
+  } else if (isPanning) {
+    panX += cx - startX;
+    panY += cy - startY;
+    startX = cx; startY = cy;
+    updateTransform();
+  }
+};
+const onPointerUp = () => {
+  isDraggingCompare = false;
+  isPanning = false;
+  preview.style.cursor = 'grab';
+};
+
+preview.addEventListener('mousedown', onPointerDown);
+window.addEventListener('mousemove', onPointerMove);
+window.addEventListener('mouseup', onPointerUp);
+preview.addEventListener('touchstart', onPointerDown, {passive: true});
+window.addEventListener('touchmove', e => { if(isDraggingCompare || isPanning) onPointerMove(e); }, {passive: true});
+window.addEventListener('touchend', onPointerUp);
+
 const dl = (blob, name) => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
 const flash = (btn, msg) => { const t = btn.textContent; btn.textContent = msg; setTimeout(() => btn.textContent = t, 1800); };
 const copy = async (btn, text) => {
   try { await navigator.clipboard.writeText(text); flash(btn, 'コピーしました'); }
-  catch (e) { flash(btn, 'コピーできませんでした'); }
+  catch (e) { flash(btn, 'コピー失敗'); }
 };
 const rows = sep => Array.from({length: cur.h}, (_, y) => cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(sep)).join('\n');
 
@@ -170,30 +345,21 @@ const loadImage = (f) => {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-  // ファイル選択
-  $('file').addEventListener('change', e => loadImage(e.target.files[0]));
-  // 設定変更時（requestRenderを使用）
-  ['w','pal','lv','sq'].forEach(id => $(id).addEventListener('input', requestRender));
+  $('darkToggle').addEventListener('change', e => {
+    if (e.target.checked) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    drawGrid();
+  });
 
-  // ドラッグ＆ドロップ対応
-  document.body.addEventListener('dragover', e => {
-    e.preventDefault();
-    document.body.classList.add('dragover');
-  });
-  document.body.addEventListener('dragleave', e => {
-    e.preventDefault();
-    if (e.clientX === 0 || e.clientY === 0) document.body.classList.remove('dragover');
-  });
+  $('file').addEventListener('change', e => loadImage(e.target.files[0]));   ['w','pal','lv','sq','gridToggle'].forEach(id =>$(id).addEventListener('input', requestRender));
+  document.querySelectorAll('.custom-c').forEach(el => el.addEventListener('input', requestRender));
+
+  document.body.addEventListener('dragover', e => { e.preventDefault(); document.body.classList.add('dragover'); });
+  document.body.addEventListener('dragleave', e => { e.preventDefault(); if (e.clientX === 0 || e.clientY === 0) document.body.classList.remove('dragover'); });
   document.body.addEventListener('drop', e => {
-    e.preventDefault();
-    document.body.classList.remove('dragover');
+    e.preventDefault(); document.body.classList.remove('dragover');
     const f = e.dataTransfer.files[0];
-    if (f) {
-      // input type="file" にも同期させる
-      const dt = new DataTransfer(); dt.items.add(f);
-      $('file').files = dt.files;
-      loadImage(f);
-    }
+    if (f) { const dt = new DataTransfer(); dt.items.add(f); $('file').files = dt.files; loadImage(f); }
   });
 
   $('bPng').addEventListener('click', () => {
@@ -208,10 +374,7 @@ window.addEventListener('DOMContentLoaded', () => {
   $('bXlsx').addEventListener('click', async e => {
     if (!cur) return;
     if (!window.ExcelJS) { flash(e.target, '部品を読み込めませんでした'); return; }
-    // ボタン連打防止
-    const btn = e.target; btn.disabled = true;
-    const t = btn.textContent; btn.textContent = '作成中...';
-    
+    const btn = e.target; btn.disabled = true; const t = btn.textContent; btn.textContent = '作成中...';
     const wb = new ExcelJS.Workbook(), ws = wb.addWorksheet('dot');
     for (let x = 1; x <= cur.w; x++) ws.getColumn(x).width = 2.7;
     for (let y = 0; y < cur.h; y++) {
@@ -222,7 +385,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     const buf = await wb.xlsx.writeBuffer();
     dl(new Blob([buf], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), 'dot-art.xlsx');
-    
     btn.textContent = t; btn.disabled = false;
   });
 
@@ -234,11 +396,10 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- 広告エリア -->
-<div style="display:flex; flex-direction:column; align-items:center; margin-top:40px; margin-bottom:20px;">
-<p style="font-size:12px; color:#888; margin-bottom:5px;">※PR</p>
-<script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="1713d060.335a82be.1713d061.5d5faf0d";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="320x48";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1790656798017";</script>
-<script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
+<!-- 広告エリア（楽天アフィリエイト） -->
+<div class="flex flex-col items-center mt-12 mb-4">
+  <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-2">※PR</p>
+  <script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="1713d060.335a82be.1713d061.5d5faf0d";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="320x48";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1791206941739";</script><script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
 </div>
 
 </body>
