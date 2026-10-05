@@ -90,14 +90,21 @@
     </select>
   </div>
   
-  <div class="space-y-3 pt-2">
-    <label class="flex items-center gap-2 text-sm cursor-pointer">
-      <input type="checkbox" id="sq" class="w-5 h-5 text-indigo-600 rounded"> 正方形に切り抜く
-    </label>
-    <label class="flex items-center gap-2 text-sm cursor-pointer">
-      <input type="checkbox" id="gridToggle" class="w-5 h-5 text-indigo-600 rounded"> ドットのグリッド線を表示
-    </label>
-  </div>
+  <!-- 追加：詳細設定アコーディオン -->
+  <details class="group bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 transition-all">
+    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between items-center text-slate-700 dark:text-slate-300">
+      <span>⚙️ 詳細設定（さらにこだわる）</span>
+      <span class="group-open:rotate-180 transition-transform duration-300">▼</span>
+    </summary>
+    <div class="pt-4 space-y-4">
+      <label class="flex items-center gap-2 text-sm cursor-pointer">
+        <input type="checkbox" id="sq" class="w-4 h-4 text-indigo-600 rounded"> 正方形に切り抜く
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer">
+        <input type="checkbox" id="gridToggle" class="w-4 h-4 text-indigo-600 rounded"> ドットのグリッド線を表示
+      </label>
+    </div>
+  </details>
 </div>
 
 <div class="lg:col-span-8 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 flex flex-col">
@@ -122,11 +129,15 @@
   
   <p id="info" class="text-xs text-slate-500 dark:text-slate-400 text-center"></p>
   
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-auto">
+  <!-- 保存ボタンエリアを2段に整理 -->
+  <div class="grid grid-cols-2 gap-2 mt-auto">
     <button id="bPng" class="bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>PNG保存</button>
     <button id="bXlsx" class="bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>Excel保存</button>
-    <button id="bTsv" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>番号表コピー</button>
-    <button id="bAi" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>AI用コピー</button>
+  </div>
+  <div class="grid grid-cols-3 gap-2 mt-2">
+    <button id="bTsv" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>番号表コピー</button>
+    <button id="bAi" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>AI用コピー</button>
+    <button id="bVba" class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-bold py-3 rounded-xl text-xs disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>VBAマクロ生成</button>
   </div>
 </div>
 
@@ -213,7 +224,7 @@ const render = () => {
   resetZoomLayout();
   updateCompare();
   
-  ['bPng','bXlsx','bTsv','bAi'].forEach(id => $(id).disabled = false);
+  ['bPng','bXlsx','bTsv','bAi','bVba'].forEach(id => $(id).disabled = false);
 };
 
 const drawGrid = () => {
@@ -336,27 +347,18 @@ const loadImage = (f) => {
   im.src = URL.createObjectURL(f);
 };
 
-// サンプル画像を自動生成する関数
 const loadSampleImage = () => {
   const c = document.createElement('canvas');
   c.width = 400; c.height = 300;
   const ctx = c.getContext('2d');
   
-  // 空
   ctx.fillStyle = '#87CEEB'; ctx.fillRect(0, 0, 400, 300);
-  // 太陽
   ctx.fillStyle = '#FFD700'; ctx.beginPath(); ctx.arc(320, 80, 40, 0, Math.PI*2); ctx.fill();
-  // 地面
   ctx.fillStyle = '#32CD32'; ctx.fillRect(0, 200, 400, 100);
-  // 家の壁
   ctx.fillStyle = '#FFF8DC'; ctx.fillRect(80, 120, 100, 80);
-  // 屋根
   ctx.fillStyle = '#CD5C5C'; ctx.beginPath(); ctx.moveTo(70, 120); ctx.lineTo(130, 60); ctx.lineTo(190, 120); ctx.fill();
-  // 窓
   ctx.fillStyle = '#87CEFA'; ctx.fillRect(100, 140, 20, 20); ctx.fillRect(140, 140, 20, 20);
-  // 木の幹
   ctx.fillStyle = '#8B4513'; ctx.fillRect(250, 150, 20, 50);
-  // 木の葉
   ctx.fillStyle = '#228B22'; ctx.beginPath(); ctx.arc(260, 130, 40, 0, Math.PI*2); ctx.fill();
 
   const im = new Image();
@@ -414,7 +416,47 @@ window.addEventListener('DOMContentLoaded', () => {
     copy(e.target, text);
   });
   
-  // 起動時にサンプル画像を読み込む
+  // ★追加：VBAマクロ生成機能
+  $('bVba').addEventListener('click', e => {
+    if (!cur) return;
+    // HTMLのカラーコード(#RRGGBB)をVBA用の形式(&HBBGGRR)に変換
+    const toVbaColor = hex => "&H" + hex.substring(5,7) + hex.substring(3,5) + hex.substring(1,3);
+    const palVba = cur.pal.map(c => toVbaColor(c)).join(', ');
+    
+    // エラーを防ぐため、1行ずつArrayにする
+    let vbaRows = [];
+    for (let y = 0; y < cur.h; y++) {
+      let row = cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(', ');
+      vbaRows.push(`    data(${y}) = Array(${row})`);
+    }
+    
+    const vbaCode = `Sub DrawDotArt()
+    ' 実用性ゼロ工房 ドット絵自動描画マクロ
+    Dim ws As Worksheet: Set ws = ActiveSheet
+    Application.ScreenUpdating = False
+    ws.Cells.Clear
+    ws.Cells.ColumnWidth = 2
+    ws.Cells.RowHeight = 13.5
+    
+    Dim pal As Variant: pal = Array(${palVba})
+    Dim data(${cur.h - 1}) As Variant
+${vbaRows.join('\n')}
+    
+    Dim r As Long, c As Long, rowData As Variant
+    For r = 0 To UBound(data)
+        rowData = data(r)
+        For c = 0 To UBound(rowData)
+            ws.Cells(r + 1, c + 1).Interior.Color = pal(rowData(c))
+        Next c
+    Next r
+    
+    Application.ScreenUpdating = True
+    MsgBox "描画完了！", vbInformation
+End Sub`;
+    
+    copy(e.target, vbaCode);
+  });
+  
   loadSampleImage();
 });
 </script>
