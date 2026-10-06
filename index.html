@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- ▼ Google Search Console 確認タグを追加 -->
+<!-- ▼ Google Search Console 確認タグ -->
 <meta name="google-site-verification" content="Rj3mWzplrv9xBEGa_NL3Vwb5G_eaeUphb7fIzfMr77w" />
 <title>写真をドット絵に変換｜無料・アップロード不要・Excel出力対応</title>
 <meta name="description" content="写真をブラウザだけでドット絵に変換。写真は外部に送信されません。ファミコン風・ゲームボーイ風の配色、正方形アイコン用の切り抜き、PNG保存、Excel出力、数字の表のコピーに対応しています。">
@@ -50,7 +50,7 @@
 
 <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
   <div class="text-center md:text-left">
-    <!-- ▼ 実用性ゼロ工房のnoteへの誘導リンクを追加 -->
+    <!-- ▼ 実用性ゼロ工房のnoteへの誘導リンク -->
     <a href="https://note.com/zero_kobo" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline mb-1 inline-block">提供：実用性ゼロ工房</a>
     <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">写真をドット絵に変換</h1>
     <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">端末内処理で安心。画面へのドラッグ＆ドロップも可能です。</p>
@@ -258,11 +258,38 @@
 <section class="lg:col-span-12 bg-white dark:bg-slate-800 p-6 md:p-10 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm mt-4 space-y-4">
   <div class="text-center mb-8">
     <h2 class="text-2xl font-bold text-slate-800 dark:text-white">機能ガイド・用語集</h2>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">各項目をクリックすると詳しい説明が開きます。</p>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">各項目をクリックすると、実用性ゼロの詳しい説明が開きます。</p>
   </div>
   
   <div class="space-y-3 max-w-4xl mx-auto">
-    <!-- ガイド項目1 -->
+    
+    <!-- ガイド項目：モザイク筆 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">🖌モザイク筆とは？</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>画像全体を変換するのではなく、プレビュー画面上でマウスや指でなぞった部分だけを局所的にドット絵化（モザイク処理）する謎機能です。社内プレゼン資料に載せる上司の顔を隠したり、見せられない機密情報を無駄にポップに隠蔽する際にご活用ください。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：レトロ配色 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">ファミコン風・ゲームボーイ風配色</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>写真の色をそのまま使うのではなく、設定メニューからあえて「16色」や「4色」に制限することで、昭和〜平成初期のレトロゲーム感を強制的に引き出す配色設定です。最新の高画質スマホで撮った写真も、一瞬で30年前の画質に劣化させることができます。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：レトロ調ディザリング -->
     <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
       <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
         <h3 class="text-base">レトロ調ディザリング（網点）とは？</h3>
@@ -275,20 +302,46 @@
       </div>
     </details>
 
-    <!-- ガイド項目2 -->
+    <!-- ガイド項目：プレビューエフェクト -->
     <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
       <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
-        <h3 class="text-base">図案モード（丸・バツ）の活用法</h3>
+        <h3 class="text-base">📺CRT / 🌀3D プレビューエフェクト</h3>
         <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
           <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
         </span>
       </summary>
       <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
-        <p>四角いドットだけでなく、丸（●）やバツ（✖）の形で書き出す機能です。「丸」はアイロンビーズ（パーラービーズ）やアクアビーズの設計図として、「バツ」はクロスステッチや刺繍の手芸用図案としてそのまま活用でき、ハンドメイドの創作活動をサポートします。</p>
+        <p>プレビュー画面の右上にあるスイッチです。CRTは昔のブラウン管テレビのような走査線と画面の歪みを再現し、3Dは画像を無意味に斜めに傾けます。もちろん出力されるPNG画像やExcelファイルには一切反映されない、完全に自己満足のためだけの無駄機能です。</p>
       </div>
     </details>
 
-    <!-- ガイド項目3 -->
+    <!-- ガイド項目：Excel保存 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">Excel保存機能（ファイルサイズ激増）</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>当工房の真骨頂です。完成したドット絵を画像としてではなく、「Excelのセル1つ1つを正方形にして、律儀に背景色を塗りつぶしたファイル」として直接出力します。ただの画像なら数キロバイトで済むところを、わざわざクソ重いExcelデータに変換してPCのメモリを無駄遣いさせます。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：AI用コピー -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">AI用コピーとは？</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>ChatGPTやClaudeなどの対話型AIに貼り付けるための、謎のテキストデータ（色番号の羅列）をクリップボードにコピーします。「このデータを使って〇〇するプログラムを書いて」とAIに丸投げするための、他力本願な現代人向けのデータ素材です。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：VBAマクロ生成 -->
     <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
       <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
         <h3 class="text-base">VBAマクロ生成機能とは？</h3>
@@ -301,7 +354,20 @@
       </div>
     </details>
 
-    <!-- ガイド項目4 -->
+    <!-- ガイド項目：図案モード -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">図案モード（丸・バツ）の活用法</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>四角いドットだけでなく、丸（●）やバツ（✖）の形で書き出す機能です。「丸」はアイロンビーズ（パーラービーズ）やアクアビーズの設計図として、「バツ」はクロスステッチや刺繍の手芸用図案としてそのまま活用でき、ハンドメイドの創作活動を無駄にサポートします。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：プライバシー -->
     <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
       <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
         <h3 class="text-base">画像アップロードの安全性（プライバシー）</h3>
@@ -313,6 +379,7 @@
         <p>当サイトの変換処理はすべて、ユーザーがお使いのブラウザ（スマホやPCの端末内）で完結する仕組みになっています。写真のデータが外部のサーバーに送信されたり、保存されたりすることは一切ありませんので、個人的な写真でも安心してご利用いただけます。</p>
       </div>
     </details>
+
   </div>
 </section>
 
