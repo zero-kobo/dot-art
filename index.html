@@ -78,9 +78,8 @@
   </div>
   <p id="modeDesc" class="text-xs text-slate-500">スライダーで元画像と比較しながら全体をドット絵にします。</p>
 
-  <!-- ★追加：サンプル画像ギャラリー -->
-  <div class="pt-2">
-    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">まずはサンプルで試す</label>
+  <div class="pt-2 border-t border-slate-100 dark:border-slate-700">
+    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 mt-4">まずはサンプルで試す</label>
     <div class="flex gap-2">
       <button onclick="loadSampleImage('landscape')" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-xs py-2 rounded-lg font-bold transition">風景</button>
       <button onclick="loadSampleImage('cat')" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-xs py-2 rounded-lg font-bold transition">黒猫</button>
@@ -92,6 +91,15 @@
     <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">自分の写真を選ぶ</label>
     <input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-100 dark:file:bg-slate-700 file:text-slate-700 dark:file:text-slate-300 file:font-bold file:cursor-pointer text-slate-500">
   </div>
+  
+  <!-- ★追加：設定ヘッダーにリセットボタンを配置 -->
+  <div class="flex justify-between items-end border-t border-slate-100 dark:border-slate-700 pt-4">
+    <h2 class="text-lg font-bold">設定</h2>
+    <button id="btnResetSettings" class="text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg transition font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+      <span>🔄</span> リセット
+    </button>
+  </div>
+
   <div>
     <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="w">横のドット数: <b id="wv" class="text-indigo-600 dark:text-indigo-400">48</b></label>
     <input type="range" id="w" min="16" max="128" step="1" value="48" class="w-full cursor-pointer">
@@ -189,8 +197,21 @@
     <button id="bVba" class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>VBAマクロ生成</button>
   </div>
 
-  <!-- ★追加：SNSシェアボタン -->
-  <div class="pt-4 border-t border-slate-100 dark:border-slate-700 mt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
+  <!-- ★追加：各ボタンの使い道・遊び方の説明アコーディオン -->
+  <details class="group bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 mt-4 transition-all">
+    <summary class="font-bold text-xs cursor-pointer list-none flex justify-between items-center text-slate-700 dark:text-slate-300">
+      <span>❓ 各ボタンの使い道・遊び方</span>
+      <span class="group-open:rotate-180 transition-transform duration-300">▼</span>
+    </summary>
+    <div class="pt-3 space-y-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+      <p><b class="text-slate-700 dark:text-slate-300">PNG保存 / Excel保存：</b> 画像として保存するか、セルを1ドットに見立てて色を塗ったExcelファイルとして保存します。</p>
+      <p><b class="text-slate-700 dark:text-slate-300">番号表コピー：</b> 色番号が並んだ表をコピーします。Excelやスプレッドシートに直接貼り付けて、条件付き書式などを自作したい上級者向けです。</p>
+      <p><b class="text-slate-700 dark:text-slate-300">AI用コピー：</b> ChatGPTやClaudeに貼り付けて、「このデータを使って〇〇するプログラムを書いて」と無茶振りするための素材データです。</p>
+      <p><b class="text-slate-700 dark:text-slate-300">VBAマクロ生成：</b> コピーしてExcelの「標準モジュール」に貼り付け、実行ボタンを押すだけで全自動でドット絵を描き上げる魔法のコードです。</p>
+    </div>
+  </details>
+
+  <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex flex-wrap items-center justify-center md:justify-start gap-3 mt-2">
     <span class="text-xs font-bold text-slate-500">友達にシェアする：</span>
     <a href="https://twitter.com/intent/tweet?text=写真をドット絵に変換！ブラウザだけで遊べる無料ツール🎨&url=https://zero-kobo.github.io/dot-art/&hashtags=ドット絵,実用性ゼロ工房" target="_blank" class="bg-black hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1">𝕏 ポスト</a>
     <a href="https://social-plugins.line.me/lineit/share?url=https://zero-kobo.github.io/dot-art/" target="_blank" class="bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1">LINEで送る</a>
@@ -211,7 +232,7 @@
   </div>
 </div>
 
-<!-- ★追加：使い方の図解ステップ -->
+<!-- 使い方の図解ステップ -->
 <section class="lg:col-span-12 bg-white dark:bg-slate-800 p-6 md:p-10 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm mt-4">
   <h2 class="text-2xl font-bold text-center mb-10 text-slate-800 dark:text-white">ツールの使い方</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -494,7 +515,6 @@ const copy = async (btn, text) => { try { await navigator.clipboard.writeText(te
 const rows = sep => Array.from({length: cur.h}, (_, y) => cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(sep)).join('\n');
 const loadImage = (f) => { if (!f || !f.type.startsWith('image/')) return; const im = new Image(); im.onload = () => { img = im; render(); }; im.src = URL.createObjectURL(f); };
 
-// ★追加：サンプル画像を生成して読み込む関数
 window.loadSampleImage = (type) => {
   const c = document.createElement('canvas'); c.width = 400; c.height = 300; const ctx = c.getContext('2d');
   
@@ -536,6 +556,24 @@ window.addEventListener('DOMContentLoaded', () => {
     if (e.target.checked) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
     drawGrid();
+  });
+
+  // ★追加：リセットボタンの動作
+  $('btnResetSettings').addEventListener('click', () => {$('w').value = 48;
+    $('pal').value = 'auto';$('lv').value = 4;
+    document.querySelector('input[name="shape"][value="square"]').checked = true;
+    $('dither').checked = false;
+    $('sq').checked = false;
+    $('gridToggle').checked = false;
+    
+    // カスタムカラーも初期値にリセット
+    const customColors = document.querySelectorAll('.custom-c');
+    customColors[0].value = "#ff0000";
+    customColors[1].value = "#00ff00";
+    customColors[2].value = "#0000ff";
+    customColors[3].value = "#ffff00";
+    
+    requestRender();
   });
 
   document.querySelectorAll('input[name="toolMode"]').forEach(el => {
@@ -610,7 +648,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (asciiText) copy(e.target, asciiText);
   });
   
-  // 初期読み込み時は風景をセット
   loadSampleImage('landscape');
 });
 </script>
