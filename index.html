@@ -32,24 +32,14 @@
   #ascii-out::-webkit-scrollbar-track { background: #1e293b; border-radius: 8px; }
   #ascii-out::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
 
-  /* ★追加：レトロCRTテレビ風エフェクト */
   .crt-effect::after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
+    content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-    background-size: 100% 4px, 3px 100%;
-    z-index: 10;
-    pointer-events: none;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+    background-size: 100% 4px, 3px 100%; z-index: 10; pointer-events: none; box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
   }
-
-  /* ★追加：無駄な3Dビューモード */
   .view-3d #img-wrapper {
     transform: perspective(1000px) rotateX(45deg) rotateZ(-15deg) scale(0.7) !important;
-    box-shadow: -20px 20px 50px rgba(0,0,0,0.4);
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
+    box-shadow: -20px 20px 50px rgba(0,0,0,0.4); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
   }
 </style>
 </head>
@@ -76,7 +66,6 @@
 <!-- 左パネル：設定 -->
 <div class="lg:col-span-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-5 h-fit">
   
-  <!-- ★UI対策：動作モードの切り替え -->
   <div class="bg-indigo-50 dark:bg-indigo-900/30 p-1 rounded-xl flex">
     <label class="flex-1 text-center cursor-pointer">
       <input type="radio" name="toolMode" value="normal" checked class="peer sr-only">
@@ -89,8 +78,18 @@
   </div>
   <p id="modeDesc" class="text-xs text-slate-500">スライダーで元画像と比較しながら全体をドット絵にします。</p>
 
+  <!-- ★追加：サンプル画像ギャラリー -->
+  <div class="pt-2">
+    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">まずはサンプルで試す</label>
+    <div class="flex gap-2">
+      <button onclick="loadSampleImage('landscape')" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-xs py-2 rounded-lg font-bold transition">風景</button>
+      <button onclick="loadSampleImage('cat')" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-xs py-2 rounded-lg font-bold transition">黒猫</button>
+      <button onclick="loadSampleImage('car')" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-xs py-2 rounded-lg font-bold transition">車</button>
+    </div>
+  </div>
+
   <div>
-    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">写真を選ぶ</label>
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">自分の写真を選ぶ</label>
     <input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-100 dark:file:bg-slate-700 file:text-slate-700 dark:file:text-slate-300 file:font-bold file:cursor-pointer text-slate-500">
   </div>
   <div>
@@ -125,7 +124,6 @@
     </select>
   </div>
   
-  <!-- UI対策：詳細設定アコーディオン -->
   <details class="group bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 transition-all">
     <summary class="font-bold text-sm cursor-pointer list-none flex justify-between items-center text-slate-700 dark:text-slate-300">
       <span>⚙ 詳細設定（さらにこだわる）</span>
@@ -154,7 +152,6 @@
 <div class="lg:col-span-8 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 flex flex-col">
   <div class="flex flex-wrap justify-between items-center gap-2">
     <h2 class="text-lg font-bold">プレビュー</h2>
-    <!-- ★UI対策：おふざけエフェクト群は右上に隔離 -->
     <div class="flex gap-2">
       <label class="flex items-center gap-1 cursor-pointer bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg text-xs hover:bg-slate-200 transition">
         <input type="checkbox" id="fxCrt" class="sr-only peer">
@@ -174,7 +171,6 @@
       <canvas id="cv-grid" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
       <canvas id="cv-original" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="clip-path: inset(0 50% 0 0);"></canvas>
       
-      <!-- 比較ハンドル -->
       <div id="compare-handle" class="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_5px_rgba(0,0,0,0.5)] cursor-ew-resize hidden" style="left: 50%; transform: translateX(-50%);">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-800 dark:text-white font-bold text-xs select-none">&lt;&gt;</div>
       </div>
@@ -192,6 +188,13 @@
     <button id="bAi" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>AI用コピー</button>
     <button id="bVba" class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>VBAマクロ生成</button>
   </div>
+
+  <!-- ★追加：SNSシェアボタン -->
+  <div class="pt-4 border-t border-slate-100 dark:border-slate-700 mt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
+    <span class="text-xs font-bold text-slate-500">友達にシェアする：</span>
+    <a href="https://twitter.com/intent/tweet?text=写真をドット絵に変換！ブラウザだけで遊べる無料ツール🎨&url=https://zero-kobo.github.io/dot-art/&hashtags=ドット絵,実用性ゼロ工房" target="_blank" class="bg-black hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1">𝕏 ポスト</a>
+    <a href="https://social-plugins.line.me/lineit/share?url=https://zero-kobo.github.io/dot-art/" target="_blank" class="bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1">LINEで送る</a>
+  </div>
 </div>
 
 <!-- アスキーアートエリア -->
@@ -207,6 +210,28 @@
     <pre id="ascii-out" class="font-mono text-[8px] leading-[8px] tracking-[0.2em] text-emerald-400 whitespace-pre"></pre>
   </div>
 </div>
+
+<!-- ★追加：使い方の図解ステップ -->
+<section class="lg:col-span-12 bg-white dark:bg-slate-800 p-6 md:p-10 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm mt-4">
+  <h2 class="text-2xl font-bold text-center mb-10 text-slate-800 dark:text-white">ツールの使い方</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl relative border border-slate-100 dark:border-slate-700">
+      <div class="absolute -top-5 -left-4 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg text-lg border-4 border-white dark:border-slate-800">1</div>
+      <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-white mt-2">画像を読み込む</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">「写真を選ぶ」ボタンから好きな画像をアップロードするか、サンプルボタンを押します。<br><br>※すべての処理はブラウザ（端末内）で行われるため、外部に写真が漏れることはありません。</p>
+    </div>
+    <div class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl relative border border-slate-100 dark:border-slate-700">
+      <div class="absolute -top-5 -left-4 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg text-lg border-4 border-white dark:border-slate-800">2</div>
+      <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-white mt-2">好みに調整する</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">ドットの粗さや、ファミコン・ゲームボーイ風などの配色を設定します。<br><br>「詳細設定」を開くと、アイロンビーズ向けの丸・バツ表示や、レトロ感を増す網点エフェクトも追加できます。</p>
+    </div>
+    <div class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl relative border border-slate-100 dark:border-slate-700">
+      <div class="absolute -top-5 -left-4 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg text-lg border-4 border-white dark:border-slate-800">3</div>
+      <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-white mt-2">保存・出力する</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">PNG画像として保存するだけでなく、Excelのセルを塗りつぶしたファイルや、ワンクリックで描画できるVBAマクロコードとしても出力できます。<br><br>おまけとして文字絵（アスキーアート）もコピー可能です。</p>
+    </div>
+  </div>
+</section>
 
 </div>
 </div>
@@ -224,15 +249,12 @@ const ASCII_CHARS = "M%#*+=-:. ";
 
 let img = null, cur = null;
 let compPos = 50;
-
-// ツールモード管理
-let currentMode = 'normal'; // 'normal' | 'mosaic'
+let currentMode = 'normal';
 
 const hex = (r,g,b) => '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
 const rgb = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16));
 const nearest = (r,g,b,pal) => { let best = 0, bd = 1e9; pal.forEach((p,i) => { const d = (r-p[0])**2 + (g-p[1])**2 + (b-p[2])**2; if (d < bd) { bd = d; best = i; } }); return best; };
 
-// ドット描画ヘルパー関数
 const drawCell = (cx, x, y, color, shape) => {
   cx.fillStyle = color; 
   if (shape === 'square') {
@@ -300,7 +322,7 @@ const render = () => {
   }
   $('ascii-out').textContent = asciiText;
 
-  cur = {w, h, idx, pal, shape}; // 現在のデータを保存
+  cur = {w, h, idx, pal, shape}; 
 
   const cv = $('cv'); cv.width = w * CELL; cv.height = h * CELL;
   const cx = cv.getContext('2d');
@@ -311,7 +333,6 @@ const render = () => {
   ctxOrg.drawImage(img, sx, sy, sw, sh, 0, 0, cvOrg.width, cvOrg.height);
 
   if (currentMode === 'normal') {
-    // 全体変換モード
     cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, cv.width, cv.height);
     idx.forEach((n, i) => { 
       const dx = (i % w) * CELL, dy = Math.floor(i / w) * CELL;
@@ -321,11 +342,10 @@ const render = () => {
     cvOrg.style.display = 'block';
     $('preview-container').style.cursor = 'grab';
   } else {
-    // モザイク筆モード（最初は元画像を表示）
     cx.drawImage(cvOrg, 0, 0);
     $('compare-handle').classList.add('hidden');
-    cvOrg.style.display = 'none'; // 比較用キャンバスは隠す
-    $('preview-container').style.cursor = 'crosshair'; // 筆アイコンに
+    cvOrg.style.display = 'none'; 
+    $('preview-container').style.cursor = 'crosshair'; 
   }
 
   const wrapper = $('img-wrapper');
@@ -365,7 +385,6 @@ const requestRender = () => {
   renderTimer = setTimeout(render, 50);
 };
 
-// ズーム・パン・比較・筆の制御
 let scale = 1, panX = 0, panY = 0;
 let isPanning = false, isDraggingCompare = false, isDrawing = false;
 let startX, startY;
@@ -403,29 +422,23 @@ preview.addEventListener('wheel', e => {
   updateTransform();
 }, {passive: false});
 
-// ★筆ツールでドットを塗る処理
 const paintMosaic = (cx, cy) => {
   if (!cur || currentMode !== 'mosaic') return;
   const rect = wrapper.getBoundingClientRect();
-  // 拡大縮小を考慮してキャンバス内の座標を計算
   const x = (cx - rect.left) / scale;
   const y = (cy - rect.top) / scale;
-  
-  // ピクセルからグリッドの行と列を計算
   const displayW = parseFloat(wrapper.style.width);
   const displayH = parseFloat(wrapper.style.height);
   const col = Math.floor((x / displayW) * cur.w);
   const row = Math.floor((y / displayH) * cur.h);
-  
-  // 周辺のドットも一緒に塗る（太筆）
   const ctx = $('cv').getContext('2d');
+  
   for(let dy = -1; dy <= 1; dy++) {
     for(let dx = -1; dx <= 1; dx++) {
       const c = col + dx, r = row + dy;
       if(c >= 0 && c < cur.w && r >= 0 && r < cur.h) {
         const i = r * cur.w + c;
         const color = cur.pal[cur.idx[i]];
-        // 既存の画像を消してドットを描画するために背景色で一度クリア
         ctx.clearRect(c * CELL, r * CELL, CELL, CELL);
         drawCell(ctx, c * CELL, r * CELL, color, cur.shape);
       }
@@ -436,13 +449,11 @@ const paintMosaic = (cx, cy) => {
 const onPointerDown = e => {
   if(!img) return;
   if(currentMode === 'mosaic') {
-    isDrawing = true;
-    paintMosaic(e.clientX || (e.touches && e.touches[0].clientX), e.clientY || (e.touches && e.touches[0].clientY));
+    isDrawing = true; paintMosaic(e.clientX || (e.touches && e.touches[0].clientX), e.clientY || (e.touches && e.touches[0].clientY));
   } else if(e.target === handle || handle.contains(e.target)) {
     isDraggingCompare = true;
   } else {
-    isPanning = true;
-    preview.style.cursor = 'grabbing';
+    isPanning = true; preview.style.cursor = 'grabbing';
   }
   startX = e.clientX || (e.touches && e.touches[0].clientX);
   startY = e.clientY || (e.touches && e.touches[0].clientY);
@@ -451,7 +462,6 @@ const onPointerMove = e => {
   if(!img) return;
   const cx = e.clientX || (e.touches && e.touches[0].clientX);
   const cy = e.clientY || (e.touches && e.touches[0].clientY);
-  
   if (isDrawing) {
     paintMosaic(cx, cy);
   } else if (isDraggingCompare) {
@@ -460,16 +470,11 @@ const onPointerMove = e => {
     compPos = Math.max(0, Math.min(100, (xInside / (rect.width / scale)) * 100));
     updateCompare();
   } else if (isPanning) {
-    panX += cx - startX;
-    panY += cy - startY;
-    startX = cx; startY = cy;
-    updateTransform();
+    panX += cx - startX; panY += cy - startY; startX = cx; startY = cy; updateTransform();
   }
 };
 const onPointerUp = () => {
-  isDraggingCompare = false;
-  isPanning = false;
-  isDrawing = false;
+  isDraggingCompare = false; isPanning = false; isDrawing = false;
   if(currentMode === 'normal') preview.style.cursor = 'grab';
 };
 
@@ -489,16 +494,40 @@ const copy = async (btn, text) => { try { await navigator.clipboard.writeText(te
 const rows = sep => Array.from({length: cur.h}, (_, y) => cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(sep)).join('\n');
 const loadImage = (f) => { if (!f || !f.type.startsWith('image/')) return; const im = new Image(); im.onload = () => { img = im; render(); }; im.src = URL.createObjectURL(f); };
 
-const loadSampleImage = () => {
+// ★追加：サンプル画像を生成して読み込む関数
+window.loadSampleImage = (type) => {
   const c = document.createElement('canvas'); c.width = 400; c.height = 300; const ctx = c.getContext('2d');
-  ctx.fillStyle = '#87CEEB'; ctx.fillRect(0, 0, 400, 300);
-  ctx.fillStyle = '#FFD700'; ctx.beginPath(); ctx.arc(320, 80, 40, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#32CD32'; ctx.fillRect(0, 200, 400, 100);
-  ctx.fillStyle = '#FFF8DC'; ctx.fillRect(80, 120, 100, 80);
-  ctx.fillStyle = '#CD5C5C'; ctx.beginPath(); ctx.moveTo(70, 120); ctx.lineTo(130, 60); ctx.lineTo(190, 120); ctx.fill();
-  ctx.fillStyle = '#87CEFA'; ctx.fillRect(100, 140, 20, 20); ctx.fillRect(140, 140, 20, 20);
-  ctx.fillStyle = '#8B4513'; ctx.fillRect(250, 150, 20, 50);
-  ctx.fillStyle = '#228B22'; ctx.beginPath(); ctx.arc(260, 130, 40, 0, Math.PI*2); ctx.fill();
+  
+  if (type === 'landscape') {
+    ctx.fillStyle = '#87CEEB'; ctx.fillRect(0, 0, 400, 300);
+    ctx.fillStyle = '#FFD700'; ctx.beginPath(); ctx.arc(320, 80, 40, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#32CD32'; ctx.fillRect(0, 200, 400, 100);
+    ctx.fillStyle = '#FFF8DC'; ctx.fillRect(80, 120, 100, 80);
+    ctx.fillStyle = '#CD5C5C'; ctx.beginPath(); ctx.moveTo(70, 120); ctx.lineTo(130, 60); ctx.lineTo(190, 120); ctx.fill();
+    ctx.fillStyle = '#87CEFA'; ctx.fillRect(100, 140, 20, 20); ctx.fillRect(140, 140, 20, 20);
+    ctx.fillStyle = '#8B4513'; ctx.fillRect(250, 150, 20, 50);
+    ctx.fillStyle = '#228B22'; ctx.beginPath(); ctx.arc(260, 130, 40, 0, Math.PI*2); ctx.fill();
+  } else if (type === 'cat') {
+    ctx.fillStyle = '#FFDEAD'; ctx.fillRect(0,0,400,300);
+    ctx.fillStyle = '#222';
+    ctx.fillRect(140, 150, 120, 90); 
+    ctx.beginPath(); ctx.arc(200, 130, 50, 0, Math.PI*2); ctx.fill(); 
+    ctx.beginPath(); ctx.moveTo(160,110); ctx.lineTo(150,60); ctx.lineTo(190,100); ctx.fill(); 
+    ctx.beginPath(); ctx.moveTo(240,110); ctx.lineTo(250,60); ctx.lineTo(210,100); ctx.fill(); 
+    ctx.fillStyle = '#FFFF00'; ctx.fillRect(180, 120, 12, 12); ctx.fillRect(210, 120, 12, 12); 
+    ctx.fillStyle = '#222'; ctx.fillRect(250, 190, 80, 15); 
+  } else if (type === 'car') {
+    ctx.fillStyle = '#87CEFA'; ctx.fillRect(0,0,400,300);
+    ctx.fillStyle = '#808080'; ctx.fillRect(0,250,400,50); 
+    ctx.fillStyle = '#FF4500'; ctx.fillRect(80, 150, 240, 60); 
+    ctx.fillRect(120, 100, 140, 50); 
+    ctx.fillStyle = '#87CEEB'; ctx.fillRect(130, 110, 50, 40); ctx.fillRect(190, 110, 60, 40); 
+    ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(130, 210, 35, 0, Math.PI*2); ctx.fill(); 
+    ctx.beginPath(); ctx.arc(270, 210, 35, 0, Math.PI*2); ctx.fill(); 
+    ctx.fillStyle = '#ccc'; ctx.beginPath(); ctx.arc(130, 210, 15, 0, Math.PI*2); ctx.fill(); 
+    ctx.beginPath(); ctx.arc(270, 210, 15, 0, Math.PI*2); ctx.fill(); 
+  }
+
   const im = new Image(); im.onload = () => { img = im; render(); }; im.src = c.toDataURL();
 };
 
@@ -509,22 +538,16 @@ window.addEventListener('DOMContentLoaded', () => {
     drawGrid();
   });
 
-  // モード切替イベント
   document.querySelectorAll('input[name="toolMode"]').forEach(el => {
     el.addEventListener('change', e => {
       currentMode = e.target.value;
       const desc = $('modeDesc');
-      if (currentMode === 'normal') {
-        desc.textContent = "スライダーで元画像と比較しながら全体をドット絵にします。";
-      } else {
-        desc.textContent = "マウスや指でなぞった部分だけをドット絵（モザイク）にします。";
-        resetZoomLayout(); // モザイク時は操作ミスを防ぐためズームリセット
-      }
-      render(); // 再描画
+      if (currentMode === 'normal') desc.textContent = "スライダーで元画像と比較しながら全体をドット絵にします。";
+      else { desc.textContent = "マウスや指でなぞった部分だけをドット絵（モザイク）にします。"; resetZoomLayout(); }
+      render();
     });
   });
 
-  // エフェクトトグル
   $('fxCrt').addEventListener('change', e => {
     if(e.target.checked) $('preview-container').classList.add('crt-effect');
     else $('preview-container').classList.remove('crt-effect');
@@ -546,10 +569,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (f) { const dt = new DataTransfer(); dt.items.add(f); $('file').files = dt.files; loadImage(f); }
   });
 
-  $('bPng').addEventListener('click', () => { if (cur)$('cv').toBlob(b => dl(b, 'dot-art.png')); });
-  
-  // Excel・文字絵出力関係は省略せずにそのまま
-  $('bXlsx').addEventListener('click', async e => {
+  $('bPng').addEventListener('click', () => { if (cur) $('cv').toBlob(b => dl(b, 'dot-art.png')); });$('bXlsx').addEventListener('click', async e => {
     if (!cur) return;
     if (!window.ExcelJS) { flash(e.target, '部品を読み込めませんでした'); return; }
     const btn = e.target; btn.disabled = true; const t = btn.textContent; btn.textContent = '作成中...';
@@ -590,11 +610,11 @@ window.addEventListener('DOMContentLoaded', () => {
     if (asciiText) copy(e.target, asciiText);
   });
   
-  loadSampleImage();
+  // 初期読み込み時は風景をセット
+  loadSampleImage('landscape');
 });
 </script>
 
-<!-- 広告エリア（楽天アフィリエイト） -->
 <div class="flex flex-col items-center mt-12 mb-4">
   <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-2">※PR</p>
   <script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="1713d060.335a82be.1713d061.5d5faf0d";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="320x48";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1791206941739";</script><script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
