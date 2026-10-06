@@ -15,9 +15,7 @@
 <meta name="twitter:image" content="https://zero-kobo.github.io/dot-art/ogp.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-  tailwind.config = {
-    darkMode: 'class',
-  }
+  tailwind.config = { darkMode: 'class' }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -26,14 +24,33 @@
   input[type=range]{accent-color:#6366f1}
   body.dragover { outline: 4px dashed #6366f1; outline-offset: -10px; }
   #preview-container { touch-action: none; overflow: hidden; position: relative; }
-  #img-wrapper { transform-origin: top left; transition: transform 0.05s ease-out; }
+  #img-wrapper { transform-origin: center center; transition: transform 0.2s ease-out; }
   input[type="color"] { -webkit-appearance: none; border: none; padding: 0; border-radius: 0.5rem; overflow: hidden; }
   input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
   input[type="color"]::-webkit-color-swatch { border: none; }
-  /* アスキーアート用のスクロールバー装飾 */
   #ascii-out::-webkit-scrollbar { width: 8px; height: 8px; }
   #ascii-out::-webkit-scrollbar-track { background: #1e293b; border-radius: 8px; }
   #ascii-out::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
+
+  /* ★追加：レトロCRTテレビ風エフェクト */
+  .crt-effect::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 4px, 3px 100%;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+  }
+
+  /* ★追加：無駄な3Dビューモード */
+  .view-3d #img-wrapper {
+    transform: perspective(1000px) rotateX(45deg) rotateZ(-15deg) scale(0.7) !important;
+    box-shadow: -20px 20px 50px rgba(0,0,0,0.4);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
+  }
 </style>
 </head>
 <body class="text-slate-800 bg-slate-50 dark:bg-slate-900 dark:text-slate-200 antialiased p-4 md:p-8 transition-colors duration-300">
@@ -58,10 +75,23 @@
 
 <!-- 左パネル：設定 -->
 <div class="lg:col-span-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-5 h-fit">
-  <h2 class="text-lg font-bold">設定</h2>
+  
+  <!-- ★UI対策：動作モードの切り替え -->
+  <div class="bg-indigo-50 dark:bg-indigo-900/30 p-1 rounded-xl flex">
+    <label class="flex-1 text-center cursor-pointer">
+      <input type="radio" name="toolMode" value="normal" checked class="peer sr-only">
+      <div class="py-2 text-sm font-bold rounded-lg peer-checked:bg-indigo-600 peer-checked:text-white text-indigo-600 dark:text-indigo-400 transition">全体変換</div>
+    </label>
+    <label class="flex-1 text-center cursor-pointer">
+      <input type="radio" name="toolMode" value="mosaic" class="peer sr-only">
+      <div class="py-2 text-sm font-bold rounded-lg peer-checked:bg-pink-600 peer-checked:text-white text-slate-500 dark:text-slate-400 transition">🖌モザイク筆</div>
+    </label>
+  </div>
+  <p id="modeDesc" class="text-xs text-slate-500">スライダーで元画像と比較しながら全体をドット絵にします。</p>
+
   <div>
-    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">写真を選ぶ（上書きされます）</label>
-    <input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 dark:file:bg-indigo-900/50 file:text-indigo-700 dark:file:text-indigo-300 file:font-bold file:cursor-pointer text-slate-500">
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="file">写真を選ぶ</label>
+    <input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-100 dark:file:bg-slate-700 file:text-slate-700 dark:file:text-slate-300 file:font-bold file:cursor-pointer text-slate-500">
   </div>
   <div>
     <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="w">横のドット数: <b id="wv" class="text-indigo-600 dark:text-indigo-400">48</b></label>
@@ -95,6 +125,7 @@
     </select>
   </div>
   
+  <!-- UI対策：詳細設定アコーディオン -->
   <details class="group bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 transition-all">
     <summary class="font-bold text-sm cursor-pointer list-none flex justify-between items-center text-slate-700 dark:text-slate-300">
       <span>⚙ 詳細設定（さらにこだわる）</span>
@@ -102,51 +133,50 @@
     </summary>
     <div class="pt-5 space-y-5">
       <div>
-        <label class="block text-xs font-medium text-slate-500 mb-2">ドットの形（アイロンビーズ・クロスステッチ等）</label>
+        <label class="block text-xs font-medium text-slate-500 mb-2">ドットの形（図案用）</label>
         <div class="flex gap-4">
-          <label class="flex items-center gap-1 text-sm cursor-pointer"><input type="radio" name="shape" value="square" checked class="text-indigo-600"> ■ 四角</label>
-          <label class="flex items-center gap-1 text-sm cursor-pointer"><input type="radio" name="shape" value="circle" class="text-indigo-600"> ● 丸</label>
-          <label class="flex items-center gap-1 text-sm cursor-pointer"><input type="radio" name="shape" value="cross" class="text-indigo-600"> ✖ バツ</label>
+          <label class="flex items-center gap-1 text-sm cursor-pointer"><input type="radio" name="shape" value="square" checked class="text-indigo-600"> ■</label>
+          <label class="flex items-center gap-1 text-sm cursor-pointer"><input type="radio" name="shape" value="circle" class="text-indigo-600"> ●</label>
+          <label class="flex items-center gap-1 text-sm cursor-pointer"><input type="radio" name="shape" value="cross" class="text-indigo-600"> ✖</label>
         </div>
       </div>
-      
       <label class="flex items-center gap-2 text-sm cursor-pointer">
-        <input type="checkbox" id="dither" class="w-5 h-5 text-indigo-600 rounded"> 
-        <div>
-          <span class="block">レトロ調ディザリング（網点）</span>
-          <span class="text-[10px] text-slate-400 block mt-0.5">※白黒やGB風など、色数が少ない時にオンにするとエモいです</span>
-        </div>
+        <input type="checkbox" id="dither" class="w-5 h-5 text-indigo-600 rounded"> レトロ調ディザリング（網点）
       </label>
-      
       <div class="h-px bg-slate-200 dark:bg-slate-700 w-full"></div>
-      
-      <label class="flex items-center gap-2 text-sm cursor-pointer">
-        <input type="checkbox" id="sq" class="w-4 h-4 text-indigo-600 rounded"> 正方形に切り抜く
-      </label>
-      <label class="flex items-center gap-2 text-sm cursor-pointer">
-        <input type="checkbox" id="gridToggle" class="w-4 h-4 text-indigo-600 rounded"> ドットのグリッド線を表示
-      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="sq" class="w-4 h-4 text-indigo-600 rounded"> 正方形に切り抜く</label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="gridToggle" class="w-4 h-4 text-indigo-600 rounded"> ドットのグリッド線</label>
     </div>
   </details>
 </div>
 
 <!-- 右パネル：プレビュー -->
 <div class="lg:col-span-8 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 flex flex-col">
-  <div class="flex justify-between items-center">
-    <h2 class="text-lg font-bold">プレビュー <span class="text-xs font-normal text-slate-500 ml-2">スクロールで拡大・ドラッグで移動</span></h2>
-    <button id="btnResetZoom" class="text-xs bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition hidden">ズームリセット</button>
+  <div class="flex flex-wrap justify-between items-center gap-2">
+    <h2 class="text-lg font-bold">プレビュー</h2>
+    <!-- ★UI対策：おふざけエフェクト群は右上に隔離 -->
+    <div class="flex gap-2">
+      <label class="flex items-center gap-1 cursor-pointer bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg text-xs hover:bg-slate-200 transition">
+        <input type="checkbox" id="fxCrt" class="sr-only peer">
+        <span class="opacity-50 peer-checked:opacity-100 grayscale peer-checked:grayscale-0">📺 CRT</span>
+      </label>
+      <label class="flex items-center gap-1 cursor-pointer bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg text-xs hover:bg-slate-200 transition">
+        <input type="checkbox" id="fx3d" class="sr-only peer">
+        <span class="opacity-50 peer-checked:opacity-100 grayscale peer-checked:grayscale-0">🌀 3D</span>
+      </label>
+      <button id="btnResetZoom" class="text-xs bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition hidden">🔍 ズームリセット</button>
+    </div>
   </div>
   
-  <div id="preview-container" class="w-full aspect-square md:aspect-video bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-grab">
+  <div id="preview-container" class="w-full aspect-square md:aspect-video bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-grab overflow-hidden">
     <div id="img-wrapper" class="relative hidden">
-      <canvas id="cv" class="block w-full h-full"></canvas>
+      <canvas id="cv" class="block w-full h-full shadow-md"></canvas>
       <canvas id="cv-grid" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
       <canvas id="cv-original" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="clip-path: inset(0 50% 0 0);"></canvas>
       
+      <!-- 比較ハンドル -->
       <div id="compare-handle" class="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_5px_rgba(0,0,0,0.5)] cursor-ew-resize hidden" style="left: 50%; transform: translateX(-50%);">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-800 dark:text-white font-bold text-xs select-none">
-          &lt;&gt;
-        </div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-800 dark:text-white font-bold text-xs select-none">&lt;&gt;</div>
       </div>
     </div>
   </div>
@@ -154,26 +184,25 @@
   <p id="info" class="text-xs text-slate-500 dark:text-slate-400 text-center"></p>
   
   <div class="grid grid-cols-2 gap-2 mt-auto">
-    <button id="bPng" class="bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>PNG保存</button>
-    <button id="bXlsx" class="bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>Excel保存</button>
+    <button id="bPng" class="bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 transition" disabled>PNG保存</button>
+    <button id="bXlsx" class="bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 transition" disabled>Excel保存</button>
   </div>
   <div class="grid grid-cols-3 gap-2 mt-2">
-    <button id="bTsv" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>番号表コピー</button>
-    <button id="bAi" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>AI用コピー</button>
-    <button id="bVba" class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-bold py-3 rounded-xl text-xs disabled:opacity-50 disabled:cursor-not-allowed transition" disabled>VBAマクロ生成</button>
+    <button id="bTsv" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>番号表コピー</button>
+    <button id="bAi" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>AI用コピー</button>
+    <button id="bVba" class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>VBAマクロ生成</button>
   </div>
 </div>
 
-<!-- ★新規追加：アスキーアートジェネレーター -->
+<!-- アスキーアートエリア -->
 <div class="lg:col-span-12 bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-800 space-y-4">
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
       <h2 class="text-lg font-bold text-white">🎁 おまけ：アスキーアート（文字絵）</h2>
-      <p class="text-xs text-slate-400 mt-1">上のドット絵と同じ解像度で文字絵を作ります。コピーしてメモ帳やSNSに貼り付けて遊べます。</p>
+      <p class="text-xs text-slate-400 mt-1">上のドット絵と同じ解像度で生成します。</p>
     </div>
     <button id="bCopyAscii" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-xl text-sm transition shadow-lg shrink-0">文字絵をコピー</button>
   </div>
-  <!-- 文字絵表示エリア -->
   <div class="w-full bg-[#0f172a] rounded-xl border border-slate-700 p-4 overflow-x-auto">
     <pre id="ascii-out" class="font-mono text-[8px] leading-[8px] tracking-[0.2em] text-emerald-400 whitespace-pre"></pre>
   </div>
@@ -190,31 +219,40 @@ const PAL = {
   nes: ['#000000','#fcfcfc','#bcbcbc','#7c7c7c','#a80020','#f83800','#fca044','#f8b800','#00a800','#58d854','#0058f8','#3cbcfc','#6844fc','#b8b8f8','#d800cc','#940084']
 };
 const CELL = 16; 
+const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+const ASCII_CHARS = "M%#*+=-:. ";
+
 let img = null, cur = null;
+let compPos = 50;
+
+// ツールモード管理
+let currentMode = 'normal'; // 'normal' | 'mosaic'
+
 const hex = (r,g,b) => '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
 const rgb = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16));
 const nearest = (r,g,b,pal) => { let best = 0, bd = 1e9; pal.forEach((p,i) => { const d = (r-p[0])**2 + (g-p[1])**2 + (b-p[2])**2; if (d < bd) { bd = d; best = i; } }); return best; };
 
-const BAYER = [
-  [ 0,  8,  2, 10],
-  [12,  4, 14,  6],
-  [ 3, 11,  1,  9],
-  [15,  7, 13,  5]
-];
-
-// アスキーアート用の記号（濃い順）
-const ASCII_CHARS = "M%#*+=-:. ";
-
-let compPos = 50;
+// ドット描画ヘルパー関数
+const drawCell = (cx, x, y, color, shape) => {
+  cx.fillStyle = color; 
+  if (shape === 'square') {
+    cx.fillRect(x, y, CELL, CELL);
+  } else if (shape === 'circle') {
+    cx.beginPath(); cx.arc(x + CELL/2, y + CELL/2, CELL/2.2, 0, Math.PI*2); cx.fill();
+  } else if (shape === 'cross') {
+    cx.strokeStyle = color; cx.lineWidth = CELL / 3.5; cx.lineCap = 'round'; cx.beginPath();
+    cx.moveTo(x + CELL*0.2, y + CELL*0.2); cx.lineTo(x + CELL*0.8, y + CELL*0.8);
+    cx.moveTo(x + CELL*0.8, y + CELL*0.2); cx.lineTo(x + CELL*0.2, y + CELL*0.8); cx.stroke();
+  }
+};
 
 const render = () => {
   if (!img) return;
   const w = +$('w').value; $('wv').textContent = w;
   
   const mode = $('pal').value;
-  const isAuto = mode === 'auto';
-  $('lvBox').style.opacity = isAuto ? '1' : '0.4';
-  $('lvBox').style.pointerEvents = isAuto ? 'auto' : 'none';
+  $('lvBox').style.opacity = (mode === 'auto') ? '1' : '0.4';
+  $('lvBox').style.pointerEvents = (mode === 'auto') ? 'auto' : 'none';
   $('customPalBox').classList.toggle('hidden', mode !== 'custom');
 
   let sx = 0, sy = 0, sw = img.width, sh = img.height;
@@ -230,17 +268,14 @@ const render = () => {
   
   const lv = +$('lv').value;
   let fixed = null;
-  if (mode === 'custom') {
-    fixed = Array.from(document.querySelectorAll('.custom-c')).map(el => rgb(el.value));
-  } else if (PAL[mode]) {
-    fixed = PAL[mode].map(rgb);
-  }
+  if (mode === 'custom') fixed = Array.from(document.querySelectorAll('.custom-c')).map(el => rgb(el.value));
+  else if (PAL[mode]) fixed = PAL[mode].map(rgb);
 
   const applyDither = $('dither').checked;
   const shape = document.querySelector('input[name="shape"]:checked').value;
 
   const map = new Map(), pal = [], idx = [];
-  let asciiText = ""; // アスキーアート用テキスト
+  let asciiText = "";
 
   for (let i = 0; i < w * h; i++) {
     const vx = i % w, vy = Math.floor(i / w);
@@ -248,11 +283,8 @@ const render = () => {
     
     if (applyDither) {
       const factor = (BAYER[vy % 4][vx % 4] / 15 - 0.5) * 64;
-      r = Math.min(255, Math.max(0, r + factor));
-      g = Math.min(255, Math.max(0, g + factor));
-      b = Math.min(255, Math.max(0, b + factor));
+      r = Math.min(255, Math.max(0, r + factor)); g = Math.min(255, Math.max(0, g + factor)); b = Math.min(255, Math.max(0, b + factor));
     }
-
     let k;
     if (fixed) k = hex(...fixed[nearest(r, g, b, fixed)]);
     else { const q = v => Math.round(Math.round(v / 255 * (lv - 1)) * 255 / (lv - 1)); k = hex(q(r), q(g), q(b)); }
@@ -260,62 +292,51 @@ const render = () => {
     if (!map.has(k)) { map.set(k, pal.length); pal.push(k); }
     idx.push(map.get(k));
 
-    // アスキーアート用の文字変換（輝度から計算）
     const rgbColor = rgb(k);
     const luma = 0.299 * rgbColor[0] + 0.587 * rgbColor[1] + 0.114 * rgbColor[2];
     const charIdx = Math.floor((luma / 256) * ASCII_CHARS.length);
-    // フォントの縦横比を補正するため、1ドットにつき同じ文字を2回出力する
     asciiText += ASCII_CHARS[charIdx] + ASCII_CHARS[charIdx];
-
-    // 行の終わりで改行
     if (vx === w - 1) asciiText += "\n";
   }
-
-  // アスキーアートを画面に出力
   $('ascii-out').textContent = asciiText;
+
+  cur = {w, h, idx, pal, shape}; // 現在のデータを保存
 
   const cv = $('cv'); cv.width = w * CELL; cv.height = h * CELL;
   const cx = cv.getContext('2d');
-  cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, cv.width, cv.height);
-
-  idx.forEach((n, i) => { 
-    const dx = (i % w) * CELL;
-    const dy = Math.floor(i / w) * CELL;
-    cx.fillStyle = pal[n]; 
-    
-    if (shape === 'square') {
-      cx.fillRect(dx, dy, CELL, CELL);
-    } else if (shape === 'circle') {
-      cx.beginPath();
-      cx.arc(dx + CELL/2, dy + CELL/2, CELL/2.2, 0, Math.PI*2);
-      cx.fill();
-    } else if (shape === 'cross') {
-      cx.strokeStyle = pal[n];
-      cx.lineWidth = CELL / 3.5;
-      cx.lineCap = 'round';
-      cx.beginPath();
-      cx.moveTo(dx + CELL*0.2, dy + CELL*0.2); cx.lineTo(dx + CELL*0.8, dy + CELL*0.8);
-      cx.moveTo(dx + CELL*0.8, dy + CELL*0.2); cx.lineTo(dx + CELL*0.2, dy + CELL*0.8);
-      cx.stroke();
-    }
-  });
   
   const cvOrg = $('cv-original');
   cvOrg.width = w * CELL; cvOrg.height = h * CELL;
   const ctxOrg = cvOrg.getContext('2d');
   ctxOrg.drawImage(img, sx, sy, sw, sh, 0, 0, cvOrg.width, cvOrg.height);
 
+  if (currentMode === 'normal') {
+    // 全体変換モード
+    cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, cv.width, cv.height);
+    idx.forEach((n, i) => { 
+      const dx = (i % w) * CELL, dy = Math.floor(i / w) * CELL;
+      drawCell(cx, dx, dy, pal[n], shape);
+    });
+    $('compare-handle').classList.remove('hidden');
+    cvOrg.style.display = 'block';
+    $('preview-container').style.cursor = 'grab';
+  } else {
+    // モザイク筆モード（最初は元画像を表示）
+    cx.drawImage(cvOrg, 0, 0);
+    $('compare-handle').classList.add('hidden');
+    cvOrg.style.display = 'none'; // 比較用キャンバスは隠す
+    $('preview-container').style.cursor = 'crosshair'; // 筆アイコンに
+  }
+
   const wrapper = $('img-wrapper');
   wrapper.classList.remove('hidden');
-  
   const parent = $('preview-container');
   const pw = parent.clientWidth - 20, ph = parent.clientHeight - 20;
   const scaleFit = Math.min(pw / w, ph / h);
   wrapper.style.width = `${w * scaleFit}px`;
   wrapper.style.height = `${h * scaleFit}px`;
 
-  $('compare-handle').classList.remove('hidden');$('info').textContent = `${w}×${h}ドット ／ 使用色 ${pal.length}色`;
-  cur = {w, h, idx, pal};
+  $('info').textContent = `${w}×${h}ドット ／ 使用色 ${pal.length}色`;
   
   drawGrid();
   resetZoomLayout();
@@ -326,17 +347,13 @@ const render = () => {
 
 const drawGrid = () => {
   const cGrid = $('cv-grid');
-  if (!$('gridToggle').checked || !cur) {
-    cGrid.style.display = 'none';
-    return;
-  }
+  if (!$('gridToggle').checked || !cur) { cGrid.style.display = 'none'; return; }
   cGrid.style.display = 'block';
   cGrid.width = cur.w * CELL; cGrid.height = cur.h * CELL;
   const ctx = cGrid.getContext('2d');
   ctx.clearRect(0, 0, cGrid.width, cGrid.height);
   ctx.strokeStyle = document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
+  ctx.lineWidth = 1; ctx.beginPath();
   for(let x=1; x<cur.w; x++) { ctx.moveTo(x * CELL, 0); ctx.lineTo(x * CELL, cGrid.height); }
   for(let y=1; y<cur.h; y++) { ctx.moveTo(0, y * CELL); ctx.lineTo(cGrid.width, y * CELL); }
   ctx.stroke();
@@ -348,8 +365,9 @@ const requestRender = () => {
   renderTimer = setTimeout(render, 50);
 };
 
+// ズーム・パン・比較・筆の制御
 let scale = 1, panX = 0, panY = 0;
-let isPanning = false, isDraggingCompare = false;
+let isPanning = false, isDraggingCompare = false, isDrawing = false;
 let startX, startY;
 const preview = $('preview-container');
 const wrapper = $('img-wrapper');
@@ -365,8 +383,10 @@ const resetZoomLayout = () => { scale = 1; panX = 0; panY = 0; updateTransform()
 $('btnResetZoom').addEventListener('click', resetZoomLayout);
 
 const updateCompare = () => {
-  cvOrg.style.clipPath = `inset(0 ${100 - compPos}% 0 0)`;
-  handle.style.left = `${compPos}%`;
+  if(currentMode === 'normal') {
+    cvOrg.style.clipPath = `inset(0 ${100 - compPos}% 0 0)`;
+    handle.style.left = `${compPos}%`;
+  }
 };
 
 preview.addEventListener('wheel', e => {
@@ -383,9 +403,42 @@ preview.addEventListener('wheel', e => {
   updateTransform();
 }, {passive: false});
 
+// ★筆ツールでドットを塗る処理
+const paintMosaic = (cx, cy) => {
+  if (!cur || currentMode !== 'mosaic') return;
+  const rect = wrapper.getBoundingClientRect();
+  // 拡大縮小を考慮してキャンバス内の座標を計算
+  const x = (cx - rect.left) / scale;
+  const y = (cy - rect.top) / scale;
+  
+  // ピクセルからグリッドの行と列を計算
+  const displayW = parseFloat(wrapper.style.width);
+  const displayH = parseFloat(wrapper.style.height);
+  const col = Math.floor((x / displayW) * cur.w);
+  const row = Math.floor((y / displayH) * cur.h);
+  
+  // 周辺のドットも一緒に塗る（太筆）
+  const ctx = $('cv').getContext('2d');
+  for(let dy = -1; dy <= 1; dy++) {
+    for(let dx = -1; dx <= 1; dx++) {
+      const c = col + dx, r = row + dy;
+      if(c >= 0 && c < cur.w && r >= 0 && r < cur.h) {
+        const i = r * cur.w + c;
+        const color = cur.pal[cur.idx[i]];
+        // 既存の画像を消してドットを描画するために背景色で一度クリア
+        ctx.clearRect(c * CELL, r * CELL, CELL, CELL);
+        drawCell(ctx, c * CELL, r * CELL, color, cur.shape);
+      }
+    }
+  }
+};
+
 const onPointerDown = e => {
   if(!img) return;
-  if(e.target === handle || handle.contains(e.target)) {
+  if(currentMode === 'mosaic') {
+    isDrawing = true;
+    paintMosaic(e.clientX || (e.touches && e.touches[0].clientX), e.clientY || (e.touches && e.touches[0].clientY));
+  } else if(e.target === handle || handle.contains(e.target)) {
     isDraggingCompare = true;
   } else {
     isPanning = true;
@@ -399,7 +452,9 @@ const onPointerMove = e => {
   const cx = e.clientX || (e.touches && e.touches[0].clientX);
   const cy = e.clientY || (e.touches && e.touches[0].clientY);
   
-  if (isDraggingCompare) {
+  if (isDrawing) {
+    paintMosaic(cx, cy);
+  } else if (isDraggingCompare) {
     const rect = wrapper.getBoundingClientRect();
     const xInside = (cx - rect.left) / scale;
     compPos = Math.max(0, Math.min(100, (xInside / (rect.width / scale)) * 100));
@@ -414,40 +469,28 @@ const onPointerMove = e => {
 const onPointerUp = () => {
   isDraggingCompare = false;
   isPanning = false;
-  preview.style.cursor = 'grab';
+  isDrawing = false;
+  if(currentMode === 'normal') preview.style.cursor = 'grab';
 };
 
 preview.addEventListener('mousedown', onPointerDown);
 window.addEventListener('mousemove', onPointerMove);
 window.addEventListener('mouseup', onPointerUp);
 preview.addEventListener('touchstart', onPointerDown, {passive: true});
-window.addEventListener('touchmove', e => { if(isDraggingCompare || isPanning) onPointerMove(e); }, {passive: true});
+window.addEventListener('touchmove', e => { if(isDraggingCompare || isPanning || isDrawing) onPointerMove(e); }, {passive: true});
 window.addEventListener('touchend', onPointerUp);
 
 const dl = (blob, name) => {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = name;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
 };
 const flash = (btn, msg) => { const t = btn.textContent; btn.textContent = msg; setTimeout(() => btn.textContent = t, 1800); };
-const copy = async (btn, text) => {
-  try { await navigator.clipboard.writeText(text); flash(btn, 'コピーしました'); }
-  catch (e) { flash(btn, 'コピー失敗'); }
-};
+const copy = async (btn, text) => { try { await navigator.clipboard.writeText(text); flash(btn, 'コピーしました'); } catch (e) { flash(btn, 'コピー失敗'); } };
 const rows = sep => Array.from({length: cur.h}, (_, y) => cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(sep)).join('\n');
-
-const loadImage = (f) => {
-  if (!f || !f.type.startsWith('image/')) return;
-  const im = new Image();
-  im.onload = () => { img = im; render(); };
-  im.src = URL.createObjectURL(f);
-};
+const loadImage = (f) => { if (!f || !f.type.startsWith('image/')) return; const im = new Image(); im.onload = () => { img = im; render(); }; im.src = URL.createObjectURL(f); };
 
 const loadSampleImage = () => {
-  const c = document.createElement('canvas');
-  c.width = 400; c.height = 300;
-  const ctx = c.getContext('2d');
-  
+  const c = document.createElement('canvas'); c.width = 400; c.height = 300; const ctx = c.getContext('2d');
   ctx.fillStyle = '#87CEEB'; ctx.fillRect(0, 0, 400, 300);
   ctx.fillStyle = '#FFD700'; ctx.beginPath(); ctx.arc(320, 80, 40, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#32CD32'; ctx.fillRect(0, 200, 400, 100);
@@ -456,10 +499,7 @@ const loadSampleImage = () => {
   ctx.fillStyle = '#87CEFA'; ctx.fillRect(100, 140, 20, 20); ctx.fillRect(140, 140, 20, 20);
   ctx.fillStyle = '#8B4513'; ctx.fillRect(250, 150, 20, 50);
   ctx.fillStyle = '#228B22'; ctx.beginPath(); ctx.arc(260, 130, 40, 0, Math.PI*2); ctx.fill();
-
-  const im = new Image();
-  im.onload = () => { img = im; render(); };
-  im.src = c.toDataURL();
+  const im = new Image(); im.onload = () => { img = im; render(); }; im.src = c.toDataURL();
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -469,7 +509,32 @@ window.addEventListener('DOMContentLoaded', () => {
     drawGrid();
   });
 
-  $('file').addEventListener('change', e => loadImage(e.target.files[0]));      ['w','pal','lv','sq','gridToggle','dither'].forEach(id =>$(id).addEventListener('input', requestRender));
+  // モード切替イベント
+  document.querySelectorAll('input[name="toolMode"]').forEach(el => {
+    el.addEventListener('change', e => {
+      currentMode = e.target.value;
+      const desc = $('modeDesc');
+      if (currentMode === 'normal') {
+        desc.textContent = "スライダーで元画像と比較しながら全体をドット絵にします。";
+      } else {
+        desc.textContent = "マウスや指でなぞった部分だけをドット絵（モザイク）にします。";
+        resetZoomLayout(); // モザイク時は操作ミスを防ぐためズームリセット
+      }
+      render(); // 再描画
+    });
+  });
+
+  // エフェクトトグル
+  $('fxCrt').addEventListener('change', e => {
+    if(e.target.checked) $('preview-container').classList.add('crt-effect');
+    else $('preview-container').classList.remove('crt-effect');
+  });
+  $('fx3d').addEventListener('change', e => {
+    if(e.target.checked) $('preview-container').classList.add('view-3d');
+    else $('preview-container').classList.remove('view-3d');
+  });
+
+  $('file').addEventListener('change', e => loadImage(e.target.files[0]));   ['w','pal','lv','sq','gridToggle','dither'].forEach(id =>$(id).addEventListener('input', requestRender));
   document.querySelectorAll('.custom-c').forEach(el => el.addEventListener('input', requestRender));
   document.querySelectorAll('input[name="shape"]').forEach(el => el.addEventListener('change', requestRender));
 
@@ -481,11 +546,9 @@ window.addEventListener('DOMContentLoaded', () => {
     if (f) { const dt = new DataTransfer(); dt.items.add(f); $('file').files = dt.files; loadImage(f); }
   });
 
-  $('bPng').addEventListener('click', () => {
-    if (!cur) return;
-    $('cv').toBlob(b => dl(b, 'dot-art.png'));
-  });
-
+  $('bPng').addEventListener('click', () => { if (cur)$('cv').toBlob(b => dl(b, 'dot-art.png')); });
+  
+  // Excel・文字絵出力関係は省略せずにそのまま
   $('bXlsx').addEventListener('click', async e => {
     if (!cur) return;
     if (!window.ExcelJS) { flash(e.target, '部品を読み込めませんでした'); return; }
@@ -513,41 +576,15 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!cur) return;
     const toVbaColor = hex => "&H" + hex.substring(5,7) + hex.substring(3,5) + hex.substring(1,3);
     const palVba = cur.pal.map(c => toVbaColor(c)).join(', ');
-    
     let vbaRows = [];
     for (let y = 0; y < cur.h; y++) {
       let row = cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(', ');
       vbaRows.push(`    data(${y}) = Array(${row})`);
     }
-    
-    const vbaCode = `Sub DrawDotArt()
-    ' 実用性ゼロ工房 ドット絵自動描画マクロ
-    Dim ws As Worksheet: Set ws = ActiveSheet
-    Application.ScreenUpdating = False
-    ws.Cells.Clear
-    ws.Cells.ColumnWidth = 2
-    ws.Cells.RowHeight = 13.5
-    
-    Dim pal As Variant: pal = Array(${palVba})
-    Dim data(${cur.h - 1}) As Variant
-${vbaRows.join('\n')}
-    
-    Dim r As Long, c As Long, rowData As Variant
-    For r = 0 To UBound(data)
-        rowData = data(r)
-        For c = 0 To UBound(rowData)
-            ws.Cells(r + 1, c + 1).Interior.Color = pal(rowData(c))
-        Next c
-    Next r
-    
-    Application.ScreenUpdating = True
-    MsgBox "描画完了！", vbInformation
-End Sub`;
-    
+    const vbaCode = `Sub DrawDotArt()\n    ' 実用性ゼロ工房 ドット絵自動描画マクロ\n    Dim ws As Worksheet: Set ws = ActiveSheet\n    Application.ScreenUpdating = False\n    ws.Cells.Clear\n    ws.Cells.ColumnWidth = 2\n    ws.Cells.RowHeight = 13.5\n    \n    Dim pal As Variant: pal = Array(${palVba})\n    Dim data(${cur.h - 1}) As Variant\n${vbaRows.join('\n')}\n    \n    Dim r As Long, c As Long, rowData As Variant\n    For r = 0 To UBound(data)\n        rowData = data(r)\n        For c = 0 To UBound(rowData)\n            ws.Cells(r + 1, c + 1).Interior.Color = pal(rowData(c))\n        Next c\n    Next r\n    \n    Application.ScreenUpdating = True\n    MsgBox "描画完了！", vbInformation\nEnd Sub`;
     copy(e.target, vbaCode);
   });
 
-  // ★新規追加：アスキーアートのコピー機能
   $('bCopyAscii').addEventListener('click', e => {
     const asciiText = $('ascii-out').textContent;
     if (asciiText) copy(e.target, asciiText);
@@ -557,6 +594,7 @@ End Sub`;
 });
 </script>
 
+<!-- 広告エリア（楽天アフィリエイト） -->
 <div class="flex flex-col items-center mt-12 mb-4">
   <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-2">※PR</p>
   <script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="1713d060.335a82be.1713d061.5d5faf0d";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="320x48";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1791206941739";</script><script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
