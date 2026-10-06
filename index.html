@@ -31,7 +31,7 @@
   #ascii-out::-webkit-scrollbar { width: 8px; height: 8px; }
   #ascii-out::-webkit-scrollbar-track { background: #1e293b; border-radius: 8px; }
   #ascii-out::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
-
+  
   .crt-effect::after {
     content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
@@ -65,7 +65,6 @@
 
 <!-- 左パネル：設定 -->
 <div class="lg:col-span-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-5 h-fit">
-  
   <div class="bg-indigo-50 dark:bg-indigo-900/30 p-1 rounded-xl flex">
     <label class="flex-1 text-center cursor-pointer">
       <input type="radio" name="toolMode" value="normal" checked class="peer sr-only">
@@ -92,7 +91,6 @@
     <input type="file" id="file" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-100 dark:file:bg-slate-700 file:text-slate-700 dark:file:text-slate-300 file:font-bold file:cursor-pointer text-slate-500">
   </div>
   
-  <!-- ★追加：設定ヘッダーにリセットボタンを配置 -->
   <div class="flex justify-between items-end border-t border-slate-100 dark:border-slate-700 pt-4">
     <h2 class="text-lg font-bold">設定</h2>
     <button id="btnResetSettings" class="text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg transition font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
@@ -178,7 +176,6 @@
       <canvas id="cv" class="block w-full h-full shadow-md"></canvas>
       <canvas id="cv-grid" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
       <canvas id="cv-original" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="clip-path: inset(0 50% 0 0);"></canvas>
-      
       <div id="compare-handle" class="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_5px_rgba(0,0,0,0.5)] cursor-ew-resize hidden" style="left: 50%; transform: translateX(-50%);">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-800 dark:text-white font-bold text-xs select-none">&lt;&gt;</div>
       </div>
@@ -197,16 +194,15 @@
     <button id="bVba" class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>VBAマクロ生成</button>
   </div>
 
-  <!-- ★追加：各ボタンの使い道・遊び方の説明アコーディオン -->
   <details class="group bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 mt-4 transition-all">
     <summary class="font-bold text-xs cursor-pointer list-none flex justify-between items-center text-slate-700 dark:text-slate-300">
-      <span>❓ 各ボタンの使い道・遊び方</span>
+      <span>❓ 各出力ボタンの使い道・遊び方</span>
       <span class="group-open:rotate-180 transition-transform duration-300">▼</span>
     </summary>
     <div class="pt-3 space-y-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
       <p><b class="text-slate-700 dark:text-slate-300">PNG保存 / Excel保存：</b> 画像として保存するか、セルを1ドットに見立てて色を塗ったExcelファイルとして保存します。</p>
-      <p><b class="text-slate-700 dark:text-slate-300">番号表コピー：</b> 色番号が並んだ表をコピーします。Excelやスプレッドシートに直接貼り付けて、条件付き書式などを自作したい上級者向けです。</p>
-      <p><b class="text-slate-700 dark:text-slate-300">AI用コピー：</b> ChatGPTやClaudeに貼り付けて、「このデータを使って〇〇するプログラムを書いて」と無茶振りするための素材データです。</p>
+      <p><b class="text-slate-700 dark:text-slate-300">番号表コピー：</b> 色番号が並んだ表をコピーします。Excel等に直接貼り付けて条件付き書式などを自作したい上級者向けです。</p>
+      <p><b class="text-slate-700 dark:text-slate-300">AI用コピー：</b> ChatGPT等に貼り付けて「このデータを使って〇〇するプログラムを書いて」と指示するための素材データです。</p>
       <p><b class="text-slate-700 dark:text-slate-300">VBAマクロ生成：</b> コピーしてExcelの「標準モジュール」に貼り付け、実行ボタンを押すだけで全自動でドット絵を描き上げる魔法のコードです。</p>
     </div>
   </details>
@@ -249,8 +245,70 @@
     <div class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl relative border border-slate-100 dark:border-slate-700">
       <div class="absolute -top-5 -left-4 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg text-lg border-4 border-white dark:border-slate-800">3</div>
       <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-white mt-2">保存・出力する</h3>
-      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">PNG画像として保存するだけでなく、Excelのセルを塗りつぶしたファイルや、ワンクリックで描画できるVBAマクロコードとしても出力できます。<br><br>おまけとして文字絵（アスキーアート）もコピー可能です。</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">PNG画像として保存するだけでなく、Excelのセルを塗りつぶしたファイルや、VBAマクロコードとしても出力できます。</p>
     </div>
+  </div>
+</section>
+
+<!-- ★追加：専門用語・機能の詳しい解説（SEO対策 ＆ ユーザーガイド） -->
+<section class="lg:col-span-12 bg-white dark:bg-slate-800 p-6 md:p-10 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm mt-4 space-y-4">
+  <div class="text-center mb-8">
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-white">機能ガイド・用語集</h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">各項目をクリックすると詳しい説明が開きます。</p>
+  </div>
+  
+  <div class="space-y-3 max-w-4xl mx-auto">
+    <!-- ガイド項目1 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">レトロ調ディザリング（網点）とは？</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>少ない色数でグラデーションや中間色を表現するため、ピクセルを市松模様のように配置する昔ながらの描画技術です。色数を「白黒」や「ゲームボーイ風」まで減らしてディザリングをオンにすると、ブラウン管テレビ時代の本格的なレトログラフィックを再現できます。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目2 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">図案モード（丸・バツ）の活用法</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>四角いドットだけでなく、丸（●）やバツ（✖）の形で書き出す機能です。「丸」はアイロンビーズ（パーラービーズ）やアクアビーズの設計図として、「バツ」はクロスステッチや刺繍の手芸用図案としてそのまま活用でき、ハンドメイドの創作活動をサポートします。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目3 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">VBAマクロ生成機能とは？</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>ドット絵のデータをExcel上で再現するためのプログラム（VBAコード）を全自動で生成する、「実用性ゼロ工房」ならではの機能です。コピーしたコードをExcelの標準モジュールに貼り付けて実行するだけで、セルが次々と自動で塗りつぶされ、ドット絵が完成していく様子を楽しめます。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目4 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">画像アップロードの安全性（プライバシー）</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>当サイトの変換処理はすべて、ユーザーがお使いのブラウザ（スマホやPCの端末内）で完結する仕組みになっています。写真のデータが外部のサーバーに送信されたり、保存されたりすることは一切ありませんので、個人的な写真でも安心してご利用いただけます。</p>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -558,7 +616,6 @@ window.addEventListener('DOMContentLoaded', () => {
     drawGrid();
   });
 
-  // ★追加：リセットボタンの動作
   $('btnResetSettings').addEventListener('click', () => {$('w').value = 48;
     $('pal').value = 'auto';$('lv').value = 4;
     document.querySelector('input[name="shape"][value="square"]').checked = true;
@@ -566,7 +623,6 @@ window.addEventListener('DOMContentLoaded', () => {
     $('sq').checked = false;
     $('gridToggle').checked = false;
     
-    // カスタムカラーも初期値にリセット
     const customColors = document.querySelectorAll('.custom-c');
     customColors[0].value = "#ff0000";
     customColors[1].value = "#00ff00";
