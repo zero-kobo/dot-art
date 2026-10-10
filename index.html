@@ -50,8 +50,8 @@
 
 <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
   <div class="text-center md:text-left">
-    <!-- ▼ 実用性ゼロ工房のnoteへの誘導リンク -->
-    <a href="https://note.com/zero_kobo" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline mb-1 inline-block">提供：実用性ゼロ工房</a>
+    <!-- ▼ ちいさなツール工房のnoteへの誘導リンク -->
+    <a href="https://note.com/zero_kobo" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline mb-1 inline-block">提供：ちいさなツール工房</a>
     <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">写真をドット絵に変換</h1>
     <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">端末内処理で安心。画面へのドラッグ＆ドロップも可能です。</p>
   </div>
@@ -265,7 +265,7 @@
 
   <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4">
     <span class="text-xs font-bold text-slate-500">友達にシェアする：</span>
-    <a href="https://twitter.com/intent/tweet?text=写真をドット絵に変換！ブラウザだけで遊べる無料ツール🎨&url=https://zero-kobo.github.io/dot-art/&hashtags=ドット絵,実用性ゼロ工房" target="_blank" class="bg-black hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1">𝕏 ポスト</a>
+    <a href="https://twitter.com/intent/tweet?text=写真をドット絵に変換！ブラウザだけで遊べる無料ツール🎨&url=https://zero-kobo.github.io/dot-art/&hashtags=ドット絵,ちいさなツール工房" target="_blank" class="bg-black hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1">𝕏 ポスト</a>
     <a href="https://social-plugins.line.me/lineit/share?url=https://zero-kobo.github.io/dot-art/" target="_blank" class="bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1">LINEで送る</a>
   </div>
 </div>
@@ -402,7 +402,7 @@
         </span>
       </summary>
       <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
-        <p>ドット絵のデータをExcel上で再現するためのプログラム（VBAコード）を全自動で生成する、「実用性ゼロ工房」ならではの機能です。コピーしたコードをExcelの標準モジュールに貼り付けて実行するだけで、セルが次々と自動で塗りつぶされ、ドット絵が完成していく様子を楽しめます。</p>
+        <p>ドット絵のデータをExcel上で再現するためのプログラム（VBAコード）を全自動で生成する、「ちいさなツール工房」ならではの機能です。コピーしたコードをExcelの標準モジュールに貼り付けて実行するだけで、セルが次々と自動で塗りつぶされ、ドット絵が完成していく様子を楽しめます。</p>
       </div>
     </details>
 
@@ -818,7 +818,7 @@ window.addEventListener('DOMContentLoaded', () => {
       let row = cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(', ');
       vbaRows.push(`    data(${y}) = Array(${row})`);
     }
-    const vbaCode = `Sub DrawDotArt()\n    ' 実用性ゼロ工房 ドット絵自動描画マクロ\n    ' 作成元ツール：https://zero-kobo.github.io/dot-art/\n    Dim ws As Worksheet: Set ws = ActiveSheet\n    Application.ScreenUpdating = False\n    ws.Cells.Clear\n    ws.Cells.ColumnWidth = 2\n    ws.Cells.RowHeight = 13.5\n    \n    Dim pal As Variant: pal = Array(${palVba})\n    Dim data(${cur.h - 1}) As Variant\n${vbaRows.join('\n')}\n    \n    Dim r As Long, c As Long, rowData As Variant\n    For r = 0 To UBound(data)\n        rowData = data(r)\n        For c = 0 To UBound(rowData)\n            ws.Cells(r + 1, c + 1).Interior.Color = pal(rowData(c))\n        Next c\n    Next r\n    \n    Application.ScreenUpdating = True\n    MsgBox "描画完了！", vbInformation\nEnd Sub`;
+    const vbaCode = `Sub DrawDotArt()\n    ' ちいさなツール工房 ドット絵自動描画マクロ\n    ' 作成元ツール：https://zero-kobo.github.io/dot-art/\n    Dim ws As Worksheet: Set ws = ActiveSheet\n    Application.ScreenUpdating = False\n    ws.Cells.Clear\n    ws.Cells.ColumnWidth = 2\n    ws.Cells.RowHeight = 13.5\n    \n    Dim pal As Variant: pal = Array(${palVba})\n    Dim data(${cur.h - 1}) As Variant\n${vbaRows.join('\n')}\n    \n    Dim r As Long, c As Long, rowData As Variant\n    For r = 0 To UBound(data)\n        rowData = data(r)\n        For c = 0 To UBound(rowData)\n            ws.Cells(r + 1, c + 1).Interior.Color = pal(rowData(c))\n        Next c\n    Next r\n    \n    Application.ScreenUpdating = True\n    MsgBox "描画完了！", vbInformation\nEnd Sub`;
     copy(e.target, vbaCode);
   });
 
