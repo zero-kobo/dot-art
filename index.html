@@ -6,7 +6,7 @@
 <!-- ▼ Google Search Console 確認タグ -->
 <meta name="google-site-verification" content="Rj3mWzplrv9xBEGa_NL3Vwb5G_eaeUphb7fIzfMr77w" />
 <title>写真をドット絵に変換｜無料・アップロード不要・Excel出力対応</title>
-<meta name="description" content="写真をブラウザだけでドット絵に変換。写真は外部に送信されません。ファミコン風・ゲームボーイ風の配色、正方形アイコン用の切り抜き、PNG保存、Excel出力、数字の表のコピーに対応しています。">
+<meta name="description" content="写真をブラウザだけでドット絵に変換。写真は外部に送信されません。ファミコン風・ゲームボーイ風の配色、位置を選べる正方形アイコン用の切り抜き、PNG保存、Excel出力、数字の表のコピーに対応しています。">
 <link rel="canonical" href="https://zero-kobo.github.io/dot-art/">
 <meta property="og:title" content="写真をドット絵に変換｜無料・アップロード不要・Excel出力対応">
 <meta property="og:description" content="写真をドット絵にして、PNG・Excel・数字の表で書き出せます。">
@@ -57,6 +57,7 @@
     <a href="https://note.com/zero_kobo" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline mb-1 inline-block">提供：ちいさなツール工房</a>
     <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">写真をドット絵に変換</h1>
     <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">端末内処理で安心。画面へのドラッグ＆ドロップも可能です。</p>
+    <p class="mt-3 inline-block text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 rounded-full px-3 py-1">🆕 2026.10 アップデート：最初からきれいな設定に／正方形の切り抜き位置を選べるように</p>
   </div>
   <label class="flex items-center cursor-pointer gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
     <span class="text-sm font-bold">🌙 ダークモード</span>
@@ -106,8 +107,22 @@
   </div>
 
   <div>
-    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="w">横のドット数: <b id="wv" class="text-indigo-600 dark:text-indigo-400">48</b></label>
-    <input type="range" id="w" min="16" max="128" step="1" value="48" class="w-full cursor-pointer">
+    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="w">横のドット数: <b id="wv" class="text-indigo-600 dark:text-indigo-400">128</b></label>
+    <input type="range" id="w" min="16" max="128" step="1" value="128" class="w-full cursor-pointer">
+    <div class="flex justify-between text-[10px] text-slate-400 mt-0.5"><span>← 粗い・レトロ</span><span>細かい・きれい →</span></div>
+  </div>
+
+  <div>
+    <label class="flex items-center gap-2 text-sm font-medium cursor-pointer"><input type="checkbox" id="sq" class="w-5 h-5 text-indigo-600 rounded"> 正方形に切り抜く（アイコン用）</label>
+    <div id="cropBox" class="hidden mt-3 space-y-2">
+      <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">明るい四角の中がドット絵になります。四角をドラッグして位置を、下のスライダーで大きさを変えられます。</p>
+      <div id="cropWrap" class="w-full flex justify-center bg-slate-900 rounded-xl overflow-hidden">
+        <canvas id="cropCv" class="block cursor-move" style="touch-action:none"></canvas>
+      </div>
+      <label class="block text-xs font-medium text-slate-500 dark:text-slate-400" for="cropS">切り抜く大きさ: <b id="cropSv" class="text-indigo-600 dark:text-indigo-400">100%</b></label>
+      <input type="range" id="cropS" min="30" max="100" step="1" value="100" class="w-full cursor-pointer">
+      <button id="btnCropCenter" type="button" class="w-full text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 py-2 rounded-lg font-bold transition">⊕ 中央・最大に戻す</button>
+    </div>
   </div>
   <div>
     <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="pal">配色</label>
@@ -130,10 +145,11 @@
   <div id="lvBox" class="transition-opacity">
     <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1" for="lv">色の細かさ</label>
     <select id="lv" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-3 cursor-pointer">
-      <option value="2">少ない（最大8色）</option>
-      <option value="3">やや少ない（最大27色）</option>
-      <option value="4" selected>ふつう（最大64色）</option>
-      <option value="6">多い（最大216色）</option>
+      <option value="128" selected>いちばん多い（最大128色・きれい）</option>
+      <option value="64">多い（最大64色）</option>
+      <option value="32">ふつう（最大32色）</option>
+      <option value="16">少ない（最大16色・ゲーム風）</option>
+      <option value="8">とても少ない（最大8色）</option>
     </select>
   </div>
   
@@ -155,7 +171,6 @@
         <input type="checkbox" id="dither" class="w-5 h-5 text-indigo-600 rounded"> レトロ調ディザリング（網点）
       </label>
       <div class="h-px bg-slate-200 dark:bg-slate-700 w-full"></div>
-      <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="sq" class="w-4 h-4 text-indigo-600 rounded"> 正方形に切り抜く</label>
       <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="gridToggle" class="w-4 h-4 text-indigo-600 rounded"> ドットのグリッド線</label>
     </div>
   </details>
@@ -299,7 +314,7 @@
     <div class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl relative border border-slate-100 dark:border-slate-700">
       <div class="absolute -top-5 -left-4 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg text-lg border-4 border-white dark:border-slate-800">2</div>
       <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-white mt-2">好みに調整する</h3>
-      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">ドットの粗さや、ファミコン・ゲームボーイ風などの配色を設定します。<br><br>「詳細設定」を開くと、アイロンビーズ向けの丸・バツ表示や、レトロ感を増す網点エフェクトも追加できます。</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">最初はいちばんきれいな設定（横128ドット・最大128色）になっています。ドット数を減らすとレトロに、ファミコン・ゲームボーイ風の配色も選べます。<br><br>アイコンにしたいときは「正方形に切り抜く」をオンにして、四角をドラッグすると好きな場所を切り抜けます。<br><br>「詳細設定」を開くと、アイロンビーズ向けの丸・バツ表示や、レトロ感を増す網点エフェクトも追加できます。</p>
     </div>
     <div class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl relative border border-slate-100 dark:border-slate-700">
       <div class="absolute -top-5 -left-4 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg text-lg border-4 border-white dark:border-slate-800">3</div>
@@ -318,6 +333,32 @@
   
   <div class="space-y-3 max-w-4xl mx-auto">
     
+    <!-- ガイド項目：正方形切り抜き -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">正方形の切り抜き（アイコン用）</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>「正方形に切り抜く」をオンにすると、元の写真の上に明るい四角が出ます。この四角の中だけがドット絵になります。四角はドラッグで動かせて、スライダーで小さくすれば顔だけ・ペットだけのアップにもできます。SNSのアイコン作りに便利です。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：色の細かさ -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">「写真の色に近づける」のしくみ</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>写真に実際に使われている色を分析して、その写真に合った色だけを選び出します。肌や空のグラデーションも、決まった色に無理やり置きかえるより自然に残ります。色数を少なくするほど、ゲームのドット絵らしい見た目になります。</p>
+      </div>
+    </details>
+
     <!-- ガイド項目：モザイク筆 -->
     <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
       <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
@@ -458,7 +499,69 @@ let currentMode = 'normal';
 
 const hex = (r,g,b) => '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
 const rgb = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16));
-const nearest = (r,g,b,pal) => { let best = 0, bd = 1e9; pal.forEach((p,i) => { const d = (r-p[0])**2 + (g-p[1])**2 + (b-p[2])**2; if (d < bd) { bd = d; best = i; } }); return best; };
+// 人の目の感じ方に寄せた色の距離（緑の差に敏感、青に鈍感）
+const cdist = (r,g,b,p) => 2*(r-p[0])**2 + 4*(g-p[1])**2 + 3*(b-p[2])**2;
+const nearest = (r,g,b,pal) => { let best = 0, bd = 1e12; for (let i = 0; i < pal.length; i++) { const d = cdist(r,g,b,pal[i]); if (d < bd) { bd = d; best = i; } } return best; };
+
+// 写真に実際に使われている色から、最大k色のパレットを作る（メディアンカット＋k-means仕上げ）
+const buildPalette = (d, n, k) => {
+  const px = new Array(n);
+  for (let i = 0; i < n; i++) px[i] = [d[i*4], d[i*4+1], d[i*4+2]];
+  const W = [2, 4, 3];
+  let boxes = [px];
+  while (boxes.length < k) {
+    let bi = -1, best = 0, bch = 0;
+    boxes.forEach((b, i) => {
+      if (b.length < 2) return;
+      for (let c = 0; c < 3; c++) {
+        let mn = 255, mx = 0;
+        for (const p of b) { if (p[c] < mn) mn = p[c]; if (p[c] > mx) mx = p[c]; }
+        const score = (mx - mn) * W[c] * Math.sqrt(b.length);
+        if (score > best) { best = score; bi = i; bch = c; }
+      }
+    });
+    if (bi < 0) break;
+    const b = boxes[bi].sort((p, q) => p[bch] - q[bch]);
+    const m = b.length >> 1;
+    boxes.splice(bi, 1, b.slice(0, m), b.slice(m));
+  }
+  let cents = boxes.map(b => { let r = 0, g = 0, bl = 0; b.forEach(p => { r += p[0]; g += p[1]; bl += p[2]; }); return [r/b.length, g/b.length, bl/b.length]; });
+  for (let it = 0; it < 3; it++) {
+    const sum = cents.map(() => [0, 0, 0, 0]);
+    for (const p of px) { const s = sum[nearest(p[0], p[1], p[2], cents)]; s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; s[3]++; }
+    cents = sum.filter(s => s[3] > 0).map(s => [s[0]/s[3], s[1]/s[3], s[2]/s[3]]);
+  }
+  return cents.map(c => c.map(v => Math.round(v)));
+};
+
+// 大きい写真を段階的に縮小して、ガタつきの少ない縮小画像を作る
+const sampleImage = (sx, sy, sw, sh, w, h) => {
+  let src = img, x0 = sx, y0 = sy, cw = sw, ch = sh;
+  while (cw > w * 2 && ch > h * 2) {
+    const nw = Math.round(cw / 2), nh = Math.round(ch / 2);
+    const t = document.createElement('canvas'); t.width = nw; t.height = nh;
+    const tx = t.getContext('2d'); tx.imageSmoothingQuality = 'high';
+    tx.drawImage(src, x0, y0, cw, ch, 0, 0, nw, nh);
+    src = t; x0 = 0; y0 = 0; cw = nw; ch = nh;
+  }
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d', {willReadFrequently: true});
+  x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(src, x0, y0, cw, ch, 0, 0, w, h);
+  return x.getImageData(0, 0, w, h).data;
+};
+
+// 正方形切り抜きの状態（中心位置は0〜1、sは短い辺に対する大きさ）
+const crop = { x: 0.5, y: 0.5, s: 1 };
+const cropRect = () => {
+  const W = img.width, H = img.height;
+  const size = Math.max(1, Math.round(Math.min(W, H) * crop.s));
+  const left = Math.max(0, Math.min(W - size, crop.x * W - size / 2));
+  const top = Math.max(0, Math.min(H - size, crop.y * H - size / 2));
+  crop.x = (left + size / 2) / W; crop.y = (top + size / 2) / H;
+  return { sx: left, sy: top, sw: size, sh: size };
+};
 
 const drawCell = (cx, x, y, color, shape) => {
   cx.fillStyle = color; 
@@ -483,20 +586,18 @@ const render = () => {
   $('customPalBox').classList.toggle('hidden', mode !== 'custom');
 
   let sx = 0, sy = 0, sw = img.width, sh = img.height;
-  if ($('sq').checked) { const s = Math.min(sw, sh); sx = (sw - s) / 2; sy = (sh - s) / 2; sw = sh = s; }
+  if ($('sq').checked) ({sx, sy, sw, sh} = cropRect());
   const h = Math.max(1, Math.round(w * sh / sw));
-  
-  const c = document.createElement('canvas'); c.width = w; c.height = h;
-  const x = c.getContext('2d', {willReadFrequently: true});
-  x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
-  x.imageSmoothingQuality = 'high';
-  x.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
-  const d = x.getImageData(0, 0, w, h).data;
-  
+
+  const d = sampleImage(sx, sy, sw, sh, w, h);
+
   const lv = +$('lv').value;
   let fixed = null;
   if (mode === 'custom') fixed = Array.from(document.querySelectorAll('.custom-c')).map(el => rgb(el.value));
   else if (PAL[mode]) fixed = PAL[mode].map(rgb);
+  else fixed = buildPalette(d, w * h, lv);
+  const ditherAmp = PAL[mode] || mode === 'custom' ? 64 : 24;
+  const nearCache = new Map();
 
   const applyDither = $('dither').checked;
   const shape = document.querySelector('input[name="shape"]:checked').value;
@@ -509,12 +610,12 @@ const render = () => {
     let r = d[i*4], g = d[i*4+1], b = d[i*4+2];
     
     if (applyDither) {
-      const factor = (BAYER[vy % 4][vx % 4] / 15 - 0.5) * 64;
-      r = Math.min(255, Math.max(0, r + factor)); g = Math.min(255, Math.max(0, g + factor)); b = Math.min(255, Math.max(0, b + factor));
+      const factor = (BAYER[vy % 4][vx % 4] / 15 - 0.5) * ditherAmp;
+      r = Math.round(Math.min(255, Math.max(0, r + factor))); g = Math.round(Math.min(255, Math.max(0, g + factor))); b = Math.round(Math.min(255, Math.max(0, b + factor)));
     }
-    let k;
-    if (fixed) k = hex(...fixed[nearest(r, g, b, fixed)]);
-    else { const q = v => Math.round(Math.round(v / 255 * (lv - 1)) * 255 / (lv - 1)); k = hex(q(r), q(g), q(b)); }
+    const key = (r << 16) | (g << 8) | b;
+    let k = nearCache.get(key);
+    if (k === undefined) { k = hex(...fixed[nearest(r, g, b, fixed)]); nearCache.set(key, k); }
     
     if (!map.has(k)) { map.set(k, pal.length); pal.push(k); }
     idx.push(map.get(k));
@@ -697,7 +798,77 @@ const dl = (blob, name) => {
 const flash = (btn, msg) => { const t = btn.textContent; btn.textContent = msg; setTimeout(() => btn.textContent = t, 1800); };
 const copy = async (btn, text) => { try { await navigator.clipboard.writeText(text); flash(btn, 'コピーしました'); } catch (e) { flash(btn, 'コピー失敗'); } };
 const rows = sep => Array.from({length: cur.h}, (_, y) => cur.idx.slice(y * cur.w, (y + 1) * cur.w).join(sep)).join('\n');
-const loadImage = (f) => { if (!f || !f.type.startsWith('image/')) return; const im = new Image(); im.onload = () => { img = im; render(); }; im.src = URL.createObjectURL(f); };
+// ---- 正方形切り抜きの位置えらび ----
+const cropCv = $('cropCv');
+let cropDrag = null;
+const resetCrop = () => { crop.x = 0.5; crop.y = 0.5; crop.s = 1; $('cropS').value = 100; $('cropSv').textContent = '100%'; };
+const drawCrop = () => {
+  if (!img || !$('sq').checked) return;
+  const box = $('cropWrap');
+  const maxW = box.clientWidth, maxH = 320;
+  let cssW = maxW, cssH = maxW * img.height / img.width;
+  if (cssH > maxH) { cssH = maxH; cssW = maxH * img.width / img.height; }
+  const dpr = window.devicePixelRatio || 1;
+  cropCv.style.width = cssW + 'px'; cropCv.style.height = cssH + 'px';
+  cropCv.width = Math.round(cssW * dpr); cropCv.height = Math.round(cssH * dpr);
+  const ctx = cropCv.getContext('2d');
+  const k = cropCv.width / img.width;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, cropCv.width, cropCv.height);
+  const r = cropRect();
+  const L = r.sx * k, T = r.sy * k, S = r.sw * k;
+  // 切り抜かれない部分を暗くする
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.beginPath();
+  ctx.rect(0, 0, cropCv.width, cropCv.height);
+  ctx.rect(L, T, S, S);
+  ctx.fill('evenodd');
+  // 枠と三分割線
+  ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1 * dpr;
+  ctx.beginPath();
+  for (let i = 1; i < 3; i++) { ctx.moveTo(L + S*i/3, T); ctx.lineTo(L + S*i/3, T + S); ctx.moveTo(L, T + S*i/3); ctx.lineTo(L + S, T + S*i/3); }
+  ctx.stroke();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2 * dpr;
+  ctx.strokeRect(L, T, S, S);
+  // 四隅のつまみ
+  const c = Math.min(14 * dpr, S / 4);
+  ctx.lineWidth = 4 * dpr; ctx.beginPath();
+  [[L, T, 1, 1], [L + S, T, -1, 1], [L, T + S, 1, -1], [L + S, T + S, -1, -1]].forEach(([x, y, dx, dy]) => {
+    ctx.moveTo(x + c*dx, y); ctx.lineTo(x, y); ctx.lineTo(x, y + c*dy);
+  });
+  ctx.stroke();
+};
+const cropPoint = e => {
+  const rect = cropCv.getBoundingClientRect();
+  return { x: (e.clientX - rect.left) / rect.width * img.width, y: (e.clientY - rect.top) / rect.height * img.height };
+};
+const onCropChange = () => { drawCrop(); requestRender(); };
+cropCv.addEventListener('pointerdown', e => {
+  if (!img) return;
+  e.preventDefault();
+  cropCv.setPointerCapture(e.pointerId);
+  const p = cropPoint(e), r = cropRect();
+  // 四角の外をタップしたら、そこへ四角を移動
+  if (p.x < r.sx || p.x > r.sx + r.sw || p.y < r.sy || p.y > r.sy + r.sh) {
+    crop.x = p.x / img.width; crop.y = p.y / img.height; onCropChange();
+  }
+  cropDrag = { px: p.x, py: p.y, cx: crop.x, cy: crop.y };
+});
+cropCv.addEventListener('pointermove', e => {
+  if (!cropDrag) return;
+  const p = cropPoint(e);
+  crop.x = cropDrag.cx + (p.x - cropDrag.px) / img.width;
+  crop.y = cropDrag.cy + (p.y - cropDrag.py) / img.height;
+  onCropChange();
+});
+['pointerup', 'pointercancel'].forEach(t => cropCv.addEventListener(t, () => { cropDrag = null; }));
+$('cropS').addEventListener('input', e => { crop.s = +e.target.value / 100; $('cropSv').textContent = e.target.value + '%'; onCropChange(); });
+$('btnCropCenter').addEventListener('click', () => { resetCrop(); onCropChange(); });
+$('sq').addEventListener('change', () => { $('cropBox').classList.toggle('hidden', !$('sq').checked); drawCrop(); });
+window.addEventListener('resize', drawCrop);
+
+const setImage = im => { img = im; resetCrop(); drawCrop(); render(); };
+const loadImage = (f) => { if (!f || !f.type.startsWith('image/')) return; const im = new Image(); im.onload = () => setImage(im); im.src = URL.createObjectURL(f); };
 
 window.loadSampleImage = (type) => {
   const c = document.createElement('canvas'); c.width = 400; c.height = 300; const ctx = c.getContext('2d');
@@ -732,7 +903,7 @@ window.loadSampleImage = (type) => {
     ctx.beginPath(); ctx.arc(270, 210, 15, 0, Math.PI*2); ctx.fill(); 
   }
 
-  const im = new Image(); im.onload = () => { img = im; render(); }; im.src = c.toDataURL();
+  const im = new Image(); im.onload = () => setImage(im); im.src = c.toDataURL();
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -742,11 +913,13 @@ window.addEventListener('DOMContentLoaded', () => {
     drawGrid();
   });
 
-  $('btnResetSettings').addEventListener('click', () => {$('w').value = 48;
-    $('pal').value = 'auto';$('lv').value = 4;
+  $('btnResetSettings').addEventListener('click', () => {$('w').value = 128;
+    $('pal').value = 'auto';$('lv').value = 128;
     document.querySelector('input[name="shape"][value="square"]').checked = true;
     $('dither').checked = false;
     $('sq').checked = false;
+    $('cropBox').classList.add('hidden');
+    resetCrop();
     $('gridToggle').checked = false;
     
     const customColors = document.querySelectorAll('.custom-c');
