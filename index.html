@@ -57,7 +57,7 @@
     <a href="https://note.com/zero_kobo" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline mb-1 inline-block">提供：ちいさなツール工房</a>
     <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">写真をドット絵に変換</h1>
     <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">端末内処理で安心。画面へのドラッグ＆ドロップも可能です。</p>
-    <p class="mt-3 inline-block text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 rounded-full px-3 py-1">🆕 2026.10 アップデート：最初からきれいな設定に／正方形の切り抜き位置を選べるように</p>
+    <p class="mt-3 inline-block text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 rounded-full px-3 py-1">🆕 2026.10 大型アップデート：きれいな初期設定／切り抜き位置・大きさ指定／フチ取り／丸アイコン保存／ビーズ必要数／ビフォー・アフター保存</p>
   </div>
   <label class="flex items-center cursor-pointer gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
     <span class="text-sm font-bold">🌙 ダークモード</span>
@@ -115,12 +115,12 @@
   <div>
     <label class="flex items-center gap-2 text-sm font-medium cursor-pointer"><input type="checkbox" id="sq" class="w-5 h-5 text-indigo-600 rounded"> 正方形に切り抜く（アイコン用）</label>
     <div id="cropBox" class="hidden mt-3 space-y-2">
-      <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">明るい四角の中がドット絵になります。四角をドラッグして位置を、下のスライダーで大きさを変えられます。</p>
+      <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">明るい四角の中がドット絵になります。四角をドラッグで移動、四隅をドラッグ（スマホは2本指ピンチ）で大きさを変えられます。顔のアップにもできます。</p>
       <div id="cropWrap" class="w-full flex justify-center bg-slate-900 rounded-xl overflow-hidden">
         <canvas id="cropCv" class="block cursor-move" style="touch-action:none"></canvas>
       </div>
       <label class="block text-xs font-medium text-slate-500 dark:text-slate-400" for="cropS">切り抜く大きさ: <b id="cropSv" class="text-indigo-600 dark:text-indigo-400">100%</b></label>
-      <input type="range" id="cropS" min="30" max="100" step="1" value="100" class="w-full cursor-pointer">
+      <input type="range" id="cropS" min="15" max="100" step="1" value="100" class="w-full cursor-pointer">
       <button id="btnCropCenter" type="button" class="w-full text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 py-2 rounded-lg font-bold transition">⊕ 中央・最大に戻す</button>
     </div>
   </div>
@@ -153,6 +153,30 @@
     </select>
   </div>
   
+  <details open class="group bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 transition-all">
+    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between items-center text-slate-700 dark:text-slate-300">
+      <span>🎚 仕上げ（明るさ・フチ取り）</span>
+      <span class="group-open:rotate-180 transition-transform duration-300">▼</span>
+    </summary>
+    <div class="pt-4 space-y-4">
+      <div>
+        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1" for="adjB">明るさ: <b id="adjBv" class="text-indigo-600 dark:text-indigo-400">0</b></label>
+        <input type="range" id="adjB" min="-50" max="50" step="1" value="0" class="w-full cursor-pointer adj">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1" for="adjC">くっきり（コントラスト）: <b id="adjCv" class="text-indigo-600 dark:text-indigo-400">0</b></label>
+        <input type="range" id="adjC" min="-50" max="50" step="1" value="0" class="w-full cursor-pointer adj">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1" for="adjS">鮮やかさ: <b id="adjSv" class="text-indigo-600 dark:text-indigo-400">0</b></label>
+        <input type="range" id="adjS" min="-100" max="100" step="1" value="0" class="w-full cursor-pointer adj">
+      </div>
+      <label class="flex items-center gap-2 text-sm cursor-pointer">
+        <input type="checkbox" id="outline" class="w-5 h-5 text-indigo-600 rounded"> フチ取り（輪郭線）でゲームキャラ風に
+      </label>
+    </div>
+  </details>
+
   <details class="group bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 transition-all">
     <summary class="font-bold text-sm cursor-pointer list-none flex justify-between items-center text-slate-700 dark:text-slate-300">
       <span>⚙ 詳細設定（さらにこだわる）</span>
@@ -205,11 +229,27 @@
   </div>
   
   <p id="info" class="text-xs text-slate-500 dark:text-slate-400 text-center"></p>
+
+  <div id="beadBox" class="hidden bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-bold text-slate-700 dark:text-slate-300">🧮 色ごとの必要数（ビーズ・刺しゅう用）</span>
+      <button id="bBeadCopy" class="text-[11px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg font-bold">一覧をコピー</button>
+    </div>
+    <p id="beadTotal" class="text-[11px] text-slate-500 mb-2"></p>
+    <div id="beadList" class="grid grid-cols-3 sm:grid-cols-4 gap-1 max-h-56 overflow-y-auto text-[11px]"></div>
+  </div>
   
   <div class="grid grid-cols-2 gap-2 mt-auto">
     <button id="bPng" class="bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 transition" disabled>PNG保存</button>
     <button id="bXlsx" class="bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 transition" disabled>Excel保存</button>
   </div>
+  <div class="grid grid-cols-2 gap-2 mt-2">
+    <button id="bIcon" class="bg-pink-600 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 transition" disabled>アイコン保存（400×400）</button>
+    <button id="bBA" class="bg-amber-500 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 transition" disabled>ビフォー・アフター保存</button>
+  </div>
+  <label class="flex items-center justify-center gap-2 text-xs cursor-pointer mt-1">
+    <input type="checkbox" id="roundIcon" class="w-4 h-4 text-pink-600 rounded"> 丸いアイコンにする（プレビューにも反映）
+  </label>
   <div class="grid grid-cols-3 gap-2 mt-2">
     <button id="bTsv" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>番号表コピー</button>
     <button id="bAi" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-xs disabled:opacity-50 transition" disabled>AI用コピー</button>
@@ -319,7 +359,7 @@
     <div class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl relative border border-slate-100 dark:border-slate-700">
       <div class="absolute -top-5 -left-4 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg text-lg border-4 border-white dark:border-slate-800">3</div>
       <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-white mt-2">保存・出力する</h3>
-      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">PNG画像として保存するだけでなく、Excelのセルを塗りつぶしたファイルや、VBAマクロコードとしても出力できます。</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">PNG画像として保存するだけでなく、SNS用の丸アイコン（400×400）、元写真と並べたビフォー・アフター画像、Excelのセルを塗りつぶしたファイルや、VBAマクロコードとしても出力できます。</p>
     </div>
   </div>
 </section>
@@ -343,6 +383,45 @@
       </summary>
       <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
         <p>「正方形に切り抜く」をオンにすると、元の写真の上に明るい四角が出ます。この四角の中だけがドット絵になります。四角はドラッグで動かせて、スライダーで小さくすれば顔だけ・ペットだけのアップにもできます。SNSのアイコン作りに便利です。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：仕上げ・フチ取り -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">仕上げ（明るさ・くっきり・鮮やかさ・フチ取り）</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>暗い写真は明るさを上げ、ぼんやりした写真は「くっきり」と「鮮やかさ」を少し上げると、ドット絵にしたときに映えます。「フチ取り」をオンにすると、明るい部分との境目に濃い線が入り、ゲームのキャラクターのような見た目になります。ドット数を少なめ（48〜64くらい）にすると効果がわかりやすいです。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：アイコン保存・ビフォーアフター -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">アイコン保存・ビフォー・アフター保存</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>「アイコン保存」はSNSのプロフィール画像向けに、400×400ピクセルの正方形で保存します。「丸いアイコンにする」をオンにすると、プレビューも丸くなり、保存した画像の四隅は透明になります。「ビフォー・アフター保存」は、元の写真とドット絵を左右に並べた1枚の画像を作ります。ブログやSNSで変化を見せたいときに便利です。</p>
+      </div>
+    </details>
+
+    <!-- ガイド項目：ビーズ必要数 -->
+    <details class="group border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50 [&_summary::-webkit-details-marker]:hidden">
+      <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-5 text-slate-900 dark:text-white font-bold">
+        <h3 class="text-base">ビーズ・刺しゅうの必要数</h3>
+        <span class="shrink-0 rounded-full bg-white dark:bg-slate-800 p-1.5 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700 transition duration-300 group-open:-rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </span>
+      </summary>
+      <div class="px-5 pb-5 leading-relaxed text-sm text-slate-600 dark:text-slate-400">
+        <p>詳細設定でドットの形を「●（ビーズ）」か「✖（刺しゅう）」にすると、プレビューの下に色ごとの必要数が多い順に出ます。番号は「番号表コピー」の番号と同じです。アイロンビーズで作るなら、横のドット数を持っているプレートのマス数に合わせ、色の細かさを「少ない」にすると現実的な数になります。</p>
       </div>
     </details>
 
@@ -591,6 +670,19 @@ const render = () => {
 
   const d = sampleImage(sx, sy, sw, sh, w, h);
 
+  // 仕上げ：明るさ・コントラスト・鮮やかさ
+  const aB = +$('adjB').value, aC = +$('adjC').value, aS = +$('adjS').value;
+  $('adjBv').textContent = aB; $('adjCv').textContent = aC; $('adjSv').textContent = aS;
+  if (aB || aC || aS) {
+    const cf = aC >= 0 ? 1 + aC / 50 : 1 + aC / 100, sf = 1 + aS / 100, bo = aB * 2;
+    for (let i = 0; i < w * h; i++) {
+      let r = d[i*4], g = d[i*4+1], b = d[i*4+2];
+      r = (r - 128) * cf + 128 + bo; g = (g - 128) * cf + 128 + bo; b = (b - 128) * cf + 128 + bo;
+      const l = 0.299 * r + 0.587 * g + 0.114 * b;
+      d[i*4] = l + (r - l) * sf; d[i*4+1] = l + (g - l) * sf; d[i*4+2] = l + (b - l) * sf;
+    }
+  }
+
   const lv = +$('lv').value;
   let fixed = null;
   if (mode === 'custom') fixed = Array.from(document.querySelectorAll('.custom-c')).map(el => rgb(el.value));
@@ -605,10 +697,12 @@ const render = () => {
   const map = new Map(), pal = [], idx = [];
   let asciiText = "";
 
+  // 1) 各ドットの色を決める
+  const cols = new Array(w * h);
   for (let i = 0; i < w * h; i++) {
     const vx = i % w, vy = Math.floor(i / w);
     let r = d[i*4], g = d[i*4+1], b = d[i*4+2];
-    
+
     if (applyDither) {
       const factor = (BAYER[vy % 4][vx % 4] / 15 - 0.5) * ditherAmp;
       r = Math.round(Math.min(255, Math.max(0, r + factor))); g = Math.round(Math.min(255, Math.max(0, g + factor))); b = Math.round(Math.min(255, Math.max(0, b + factor)));
@@ -616,7 +710,29 @@ const render = () => {
     const key = (r << 16) | (g << 8) | b;
     let k = nearCache.get(key);
     if (k === undefined) { k = hex(...fixed[nearest(r, g, b, fixed)]); nearCache.set(key, k); }
-    
+    cols[i] = k;
+  }
+
+  // 2) フチ取り：明るい色と接している暗い側のドットを、さらに暗くして輪郭線にする
+  if ($('outline').checked) {
+    const lum = cols.map(k => { const c = rgb(k); return 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]; });
+    const isFixed = mode !== 'auto';
+    let darkest = null;
+    if (isFixed) { darkest = fixed.reduce((a, c) => (0.299*c[0]+0.587*c[1]+0.114*c[2]) < (0.299*a[0]+0.587*a[1]+0.114*a[2]) ? c : a); darkest = hex(...darkest); }
+    const T = 40, out = cols.slice();
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = y * w + x, L = lum[i];
+      if ((x > 0 && lum[i-1] - L > T) || (x < w-1 && lum[i+1] - L > T) || (y > 0 && lum[i-w] - L > T) || (y < h-1 && lum[i+w] - L > T)) {
+        if (isFixed) out[i] = darkest;
+        else { const c = rgb(cols[i]); out[i] = hex(...c.map(v => Math.round(v * 0.3))); }
+      }
+    }
+    for (let i = 0; i < w * h; i++) cols[i] = out[i];
+  }
+
+  // 3) 番号表と文字絵を作る
+  for (let i = 0; i < w * h; i++) {
+    const k = cols[i], vx = i % w;
     if (!map.has(k)) { map.set(k, pal.length); pal.push(k); }
     idx.push(map.get(k));
 
@@ -628,7 +744,7 @@ const render = () => {
   }
   $('ascii-out').textContent = asciiText;
 
-  cur = {w, h, idx, pal, shape}; 
+  cur = {w, h, idx, pal, shape, src: {sx, sy, sw, sh}};
 
   const cv = $('cv'); cv.width = w * CELL; cv.height = h * CELL;
   const cx = cv.getContext('2d');
@@ -668,7 +784,28 @@ const render = () => {
   resetZoomLayout();
   updateCompare();
   
-  ['bPng','bXlsx','bTsv','bAi','bVba'].forEach(id => $(id).disabled = false);
+  wrapper.style.clipPath = $('roundIcon').checked ? 'ellipse(50% 50% at 50% 50%)' : '';
+  renderBeads();
+
+  ['bPng','bXlsx','bTsv','bAi','bVba','bIcon','bBA'].forEach(id => $(id).disabled = false);
+};
+
+// ビーズ・刺しゅう用：色ごとの必要数
+const beadCounts = () => {
+  const cnt = cur.pal.map((c, i) => ({ c, i, n: 0 }));
+  cur.idx.forEach(n => cnt[n].n++);
+  return cnt.filter(o => o.n > 0).sort((a, b) => b.n - a.n);
+};
+const renderBeads = () => {
+  const show = cur && cur.shape !== 'square';
+  $('beadBox').classList.toggle('hidden', !show);
+  if (!show) return;
+  const list = beadCounts();
+  $('beadTotal').textContent = `全部で ${cur.idx.length.toLocaleString()} 個 ／ ${list.length} 色（多い順）`;
+  $('beadList').innerHTML = list.map(o =>
+    `<div class="flex items-center gap-1 bg-white dark:bg-slate-800 rounded-md px-1.5 py-1 border border-slate-200 dark:border-slate-700">` +
+    `<span class="inline-block w-4 h-4 rounded-full border border-slate-300 shrink-0" style="background:${o.c}"></span>` +
+    `<span class="font-mono text-slate-500">${o.i}</span><b class="ml-auto">${o.n}</b></div>`).join('');
 };
 
 const drawGrid = () => {
@@ -842,26 +979,87 @@ const cropPoint = e => {
   const rect = cropCv.getBoundingClientRect();
   return { x: (e.clientX - rect.left) / rect.width * img.width, y: (e.clientY - rect.top) / rect.height * img.height };
 };
+const CROP_MIN = 0.15;
+const syncCropSlider = () => { const v = Math.round(crop.s * 100); $('cropS').value = v; $('cropSv').textContent = v + '%'; };
+const setCropScale = s => { crop.s = Math.max(CROP_MIN, Math.min(1, s)); syncCropSlider(); };
 const onCropChange = () => { drawCrop(); requestRender(); };
+// 指やマウスの近くにある角（なければnull）
+const hitCorner = (e, p) => {
+  const r = cropRect(), rect = cropCv.getBoundingClientRect();
+  const tol = 26 * img.width / rect.width;
+  const corners = [[r.sx, r.sy], [r.sx + r.sw, r.sy], [r.sx, r.sy + r.sh], [r.sx + r.sw, r.sy + r.sh]];
+  for (let i = 0; i < 4; i++) {
+    if (Math.abs(p.x - corners[i][0]) < tol && Math.abs(p.y - corners[i][1]) < tol) return { i, anchor: corners[3 - i] };
+  }
+  return null;
+};
+const pointers = new Map();
+let pinch = null;
 cropCv.addEventListener('pointerdown', e => {
   if (!img) return;
   e.preventDefault();
   cropCv.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 2) {
+    // 2本指：ピンチで大きさを変える
+    const [a, b] = [...pointers.values()];
+    pinch = { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, s: crop.s };
+    cropDrag = null;
+    return;
+  }
   const p = cropPoint(e), r = cropRect();
+  const corner = hitCorner(e, p);
+  if (corner) { cropDrag = { mode: 'resize', ax: corner.anchor[0], ay: corner.anchor[1] }; return; }
   // 四角の外をタップしたら、そこへ四角を移動
   if (p.x < r.sx || p.x > r.sx + r.sw || p.y < r.sy || p.y > r.sy + r.sh) {
     crop.x = p.x / img.width; crop.y = p.y / img.height; onCropChange();
   }
-  cropDrag = { px: p.x, py: p.y, cx: crop.x, cy: crop.y };
+  cropDrag = { mode: 'move', px: p.x, py: p.y, cx: crop.x, cy: crop.y };
 });
 cropCv.addEventListener('pointermove', e => {
-  if (!cropDrag) return;
+  if (!img) return;
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pinch && pointers.size >= 2) {
+    const [a, b] = [...pointers.values()];
+    setCropScale(pinch.s * pinch.dist / (Math.hypot(a.x - b.x, a.y - b.y) || 1));
+    onCropChange();
+    return;
+  }
   const p = cropPoint(e);
-  crop.x = cropDrag.cx + (p.x - cropDrag.px) / img.width;
-  crop.y = cropDrag.cy + (p.y - cropDrag.py) / img.height;
+  if (!cropDrag) {
+    // 角の上ではカーソルを拡大縮小の形に
+    const c = hitCorner(e, p);
+    cropCv.style.cursor = c ? (c.i === 0 || c.i === 3 ? 'nwse-resize' : 'nesw-resize') : 'move';
+    return;
+  }
+  if (cropDrag.mode === 'move') {
+    crop.x = cropDrag.cx + (p.x - cropDrag.px) / img.width;
+    crop.y = cropDrag.cy + (p.y - cropDrag.py) / img.height;
+  } else {
+    // 反対側の角を固定して大きさを変える
+    const W = img.width, H = img.height, base = Math.min(W, H);
+    const { ax, ay } = cropDrag;
+    const dirX = p.x < ax ? -1 : 1, dirY = p.y < ay ? -1 : 1;
+    const maxS = Math.min(dirX < 0 ? ax : W - ax, dirY < 0 ? ay : H - ay);
+    const size = Math.max(base * CROP_MIN, Math.min(maxS, Math.max(Math.abs(p.x - ax), Math.abs(p.y - ay))));
+    const left = dirX < 0 ? ax - size : ax, top = dirY < 0 ? ay - size : ay;
+    crop.x = (left + size / 2) / W; crop.y = (top + size / 2) / H;
+    setCropScale(size / base);
+  }
   onCropChange();
 });
-['pointerup', 'pointercancel'].forEach(t => cropCv.addEventListener(t, () => { cropDrag = null; }));
+const endPointer = e => {
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinch = null;
+  if (pointers.size === 0) cropDrag = null;
+};
+['pointerup', 'pointercancel'].forEach(t => cropCv.addEventListener(t, endPointer));
+cropCv.addEventListener('wheel', e => {
+  if (!img) return;
+  e.preventDefault();
+  setCropScale(crop.s * (1 + e.deltaY * 0.001));
+  onCropChange();
+}, { passive: false });
 $('cropS').addEventListener('input', e => { crop.s = +e.target.value / 100; $('cropSv').textContent = e.target.value + '%'; onCropChange(); });
 $('btnCropCenter').addEventListener('click', () => { resetCrop(); onCropChange(); });
 $('sq').addEventListener('change', () => { $('cropBox').classList.toggle('hidden', !$('sq').checked); drawCrop(); });
@@ -920,6 +1118,10 @@ window.addEventListener('DOMContentLoaded', () => {
     $('sq').checked = false;
     $('cropBox').classList.add('hidden');
     resetCrop();
+    ['adjB','adjC','adjS'].forEach(id => $(id).value = 0);
+    $('outline').checked = false;
+    $('roundIcon').checked = false;
+    $('img-wrapper').style.clipPath = '';
     $('gridToggle').checked = false;
     
     const customColors = document.querySelectorAll('.custom-c');
@@ -962,7 +1164,57 @@ window.addEventListener('DOMContentLoaded', () => {
     if (f) { const dt = new DataTransfer(); dt.items.add(f); $('file').files = dt.files; loadImage(f); }
   });
 
-  $('bPng').addEventListener('click', () => { if (cur) $('cv').toBlob(b => dl(b, 'dot-art.png')); });$('bXlsx').addEventListener('click', async e => {
+  $('bPng').addEventListener('click', () => { if (cur) $('cv').toBlob(b => dl(b, 'dot-art.png')); });
+
+  // アイコン保存：400×400（長方形なら真ん中を正方形に）、丸アイコンなら角を透明に
+  $('bIcon').addEventListener('click', () => {
+    if (!cur) return;
+    const n = Math.min(cur.w, cur.h);
+    const ox = Math.floor((cur.w - n) / 2), oy = Math.floor((cur.h - n) / 2);
+    const S = 400, c = document.createElement('canvas'); c.width = S; c.height = S;
+    const x = c.getContext('2d');
+    x.imageSmoothingEnabled = false;
+    if ($('roundIcon').checked) { x.beginPath(); x.arc(S/2, S/2, S/2, 0, Math.PI * 2); x.clip(); }
+    x.drawImage($('cv'), ox * CELL, oy * CELL, n * CELL, n * CELL, 0, 0, S, S);
+    c.toBlob(b => dl(b, 'dot-icon.png'));
+  });
+
+  // ビフォー・アフター：元写真とドット絵を横に並べた1枚
+  $('bBA').addEventListener('click', () => {
+    if (!cur) return;
+    const P = 600, pad = 32, top = 72, foot = 48;
+    const ih = Math.round(P * cur.h / cur.w);
+    const c = document.createElement('canvas');
+    c.width = P * 2 + pad * 3; c.height = top + ih + foot;
+    const x = c.getContext('2d');
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, c.width, c.height);
+    const { sx, sy, sw, sh } = cur.src;
+    x.imageSmoothingQuality = 'high';
+    x.drawImage(img, sx, sy, sw, sh, pad, top, P, ih);
+    x.imageSmoothingEnabled = false;
+    x.drawImage($('cv'), 0, 0, cur.w * CELL, cur.h * CELL, pad * 2 + P, top, P, ih);
+    x.fillStyle = '#1e293b'; x.font = 'bold 34px "Noto Sans JP", sans-serif'; x.textAlign = 'center';
+    x.fillText('BEFORE', pad + P / 2, 50);
+    x.fillText('AFTER', pad * 2 + P * 1.5, 50);
+    x.fillStyle = '#6366f1'; x.font = 'bold 26px sans-serif';
+    x.fillText('▶', c.width / 2, top + ih / 2 + 9);
+    x.fillStyle = '#94a3b8'; x.font = '20px "Noto Sans JP", sans-serif';
+    x.fillText('写真をドット絵に変換｜zero-kobo.github.io/dot-art', c.width / 2, top + ih + 32);
+    c.toBlob(b => dl(b, 'dot-art-before-after.png'));
+  });
+
+  $('bBeadCopy').addEventListener('click', e => {
+    if (!cur) return;
+    const list = beadCounts();
+    const text = `色ごとの必要数（全${cur.idx.length}個・${list.length}色）\n` + list.map(o => `${o.i}\t${o.c}\t${o.n}個`).join('\n');
+    copy(e.target, text);
+  });
+
+  $('roundIcon').addEventListener('change', () => {
+    $('img-wrapper').style.clipPath = $('roundIcon').checked ? 'ellipse(50% 50% at 50% 50%)' : '';
+  });
+  document.querySelectorAll('.adj').forEach(el => el.addEventListener('input', requestRender));
+  $('outline').addEventListener('change', requestRender);$('bXlsx').addEventListener('click', async e => {
     if (!cur) return;
     if (!window.ExcelJS) { flash(e.target, '部品を読み込めませんでした'); return; }
     const btn = e.target; btn.disabled = true; const t = btn.textContent; btn.textContent = '作成中...';
